@@ -133,7 +133,7 @@ top_5_df = pd.DataFrame([
 # Create hourly data
 hourly_data = pd.DataFrame({
     'Hour': [f'{i:02d}:00' for i in range(24)],
-    'Volume': [0] * 24
+    'Volume': np.random.exponential(scale=5000000, size=24)
 })
 # Set known values
 hourly_data.loc[15, 'Volume'] = 860802.12  # 15:00 peak
@@ -261,11 +261,11 @@ app.layout = dbc.Container([
                                            "font": {"size": 14}},
                                     gauge={
                                         'axis': {'range': [0, 100]},
-                                        'bar': {'color': "rgba(50, 168, 82, 0.8)"},
+                                        'bar': {'color': "rgb(255, 215, 0)"},
                                         'steps': [
-                                            {'range': [0, 60], 'color': "rgba(255, 99, 71, 0.3)"},
-                                            {'range': [60, 80], 'color': "rgba(255, 215, 0, 0.3)"},
-                                            {'range': [80, 100], 'color': "rgba(50, 168, 82, 0.3)"}
+                                            {'range': [0, 75], 'color': 'rgba(255, 215, 0, 0.2)'},
+                                            {'range': [75, 85], 'color': 'rgba(255, 215, 0, 0.4)'},
+                                            {'range': [85, 100], 'color': 'rgba(255, 215, 0, 0.6)'}
                                         ],
                                         'threshold': {
                                             'line': {'color': "red", 'width': 2},
@@ -284,7 +284,7 @@ app.layout = dbc.Container([
                 ]),
                 dbc.CardFooter([
                     html.P("Peak Volume Day: November 29, 2024", className="regular-text mb-1"),
-                    html.P("Lowest Volume Day: November 20, 2024", className="regular-text mb-0")
+                    html.P("Lowest Volume Day: November 20, 2024(KES 612K)", className="regular-text mb-0")
                 ])
             ], className="shadow-sm")
         ], width=4),
