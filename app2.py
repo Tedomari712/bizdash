@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
+from dash.dependencies import Input, Output  # Added this line
 import dash_bootstrap_components as dbc
 import numpy as np
 import os
@@ -177,7 +178,7 @@ app.layout = dbc.Container([
                      className='logo', 
                      style={'height': '150px', 'object-fit': 'contain'})
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
-            html.H1("November Bank Transfer Analysis", 
+            html.H1("November Business Transfer Analysis", 
                    className="text-primary text-center mb-4",
                    style={'letterSpacing': '2px'})
         ])
