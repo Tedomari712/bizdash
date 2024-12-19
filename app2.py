@@ -174,7 +174,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.Div([
-                html.Img(src='https://github.com/Tedomari712/mockdash/blob/main/LEMFI.png?raw=true',
+                html.Img(src='/assets/LEMFI.png',
                      className='logo', 
                      style={'height': '150px', 'object-fit': 'contain'})
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
@@ -259,7 +259,7 @@ app.layout = dbc.Container([
                             data=[
                                 go.Indicator(
                                     mode="number",
-                                    value=4526904.18,  # Peak daily volume
+                                    value=4.53,  # Peak daily volume
                                     number={"prefix": "KES ", "suffix": "M",
                                            "valueformat": ".1f",
                                            "font": {"size": 24}},
@@ -270,7 +270,7 @@ app.layout = dbc.Container([
                                 ),
                                 go.Indicator(
                                     mode="number",
-                                    value=2473923.12,  # Average daily volume
+                                    value=2.47,  # Average daily volume
                                     number={"prefix": "KES ", "suffix": "M",
                                            "valueformat": ".1f",
                                            "font": {"size": 24}},
@@ -288,6 +288,16 @@ app.layout = dbc.Container([
                                            "font": {"size": 14},
                                            "align": "center"},
                                     domain={'x': [0.05, 0.45], 'y': [0.375, 0.625]}
+                                ),
+                                go.Indicator(
+                                    mode="number",
+                                    value=121,
+                                    number={"valueformat": ",",
+                                           "font": {"size": 24}},
+                                    title={"text": "Average Daily Transactions",
+                                           "font": {"size": 14},
+                                           "align": "center"},
+                                    domain={'x': [0.55, 0.95], 'y': [0.375, 0.625]}
                                 ),
                                 go.Indicator(
                                     mode="gauge+number",
@@ -325,7 +335,7 @@ app.layout = dbc.Container([
                         dbc.Row([
                             dbc.Col([
                                 html.P("Peak Volume Day: November 29, 2024", className="regular-text mb-1"),
-                                html.P("Lowest Volume Day: November 20, 2024 (KES 611,787.91)", className="regular-text mb-0")
+                                html.P("Lowest Volume Day: November 20, 2024 (KES 612K)", className="regular-text mb-0")
                             ])
                         ])
                     ], className="small")
@@ -528,7 +538,7 @@ app.layout = dbc.Container([
                 dbc.CardHeader("Client Market Share"),
                 dbc.CardBody([
                     html.Img(
-                        src='https://github.com/Tedomari712/mockdash/blob/main/LEMFI.png?raw=true',
+                        src='/assets/LEMFI.png',
                         style={
                             'width': '50%',
                             'display': 'block',
