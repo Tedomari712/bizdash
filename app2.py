@@ -174,7 +174,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.Div([
-                html.Img(src='/assets/LEMFI.png',
+                html.Img(src='/assets/vngrd.PNG',
                      className='logo', 
                      style={'height': '150px', 'object-fit': 'contain'})
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
