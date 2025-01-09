@@ -132,58 +132,90 @@ recipients_data = pd.DataFrame({
     'Market_Share': [6.53, 10.58, 6.88, 22.25, 8.50, 8.52, 15.27, 10.34]
 })
 
-# Hourly distribution data
-hourly_data = pd.DataFrame({
-    'Hour': [f'{i:02d}:00' for i in range(24)],
-    'Volume': [
-        27533935.96, 28073270.30, 29035102.50, 24136418.10, 20726459.19,
-        18337660.33, 31046599.22, 18624343.36, 17163342.76, 17538441.06,
-        15470631.39, 18356204.26, 18473250.50, 16966374.97, 21376240.02,
-        24886442.52, 26430533.46, 36983605.96, 32593463.80, 33624440.10,
-        35671112.12, 41021127.01, 41365601.43, 47980870.44
-    ]
-})
+# App Layout
+app.layout = dbc.Container([
+    # Header with logo and title
+    dbc.Row([
+        dbc.Col([
+            html.Div([
+                html.Img(src='/assets/vngrd.PNG',
+                    className='logo', 
+                    style={'height': '150px', 'object-fit': 'contain'})
+            ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 
+                     'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
+            html.H1("2024 Annual Business Transfer Analysis", 
+                   className="text-primary text-center mb-4",
+                   style={'letterSpacing': '2px'})
+        ])
+    ]),
 
-failure_data = pd.DataFrame({
-    'Reason': ['Insufficient Balance', 'Other', 'System Error', 'Invalid Account', 
-               'Invalid Credit Party', 'Timed Out', 'General Failure', 'SOAP Error', 'Limit Exceeded'],
-    'Count': [2216, 592, 437, 251, 83, 133, 23, 6, 2],
-    'Percentage': [58.3, 15.6, 11.5, 6.6, 2.2, 3.5, 0.6, 0.2, 0.1]
-})
-
-# Detailed country data from PDF
-country_data = pd.DataFrame({
-    'Country': ['United Kingdom (GBR)', 'United States (USA)', 'Canada (CAN)', 
-                'Kenya (KEN)', 'Nigeria (NGA)', 'Tanzania (TZA)', 'UAE',
-                'Denmark (DEN)', 'India (IND)'],
-    'Volume_KES': [961197746.35, 422501849.21, 68916278.01, 
-                   32036111.63, 6352832.02, 391069.01, 51955.00,
-                   159767.50, 45998.61],
-    'Transactions': [18050, 7906, 1842, 1339, 395, 6, 2, 4, 2]
-})
-
-client_data = pd.DataFrame({
-    'Client': ['Lemfi', 'DLocal', 'Tangent', 'Nala', 'Wapipay', 'Brij', 
-              'Cellulant', 'Others'],
-    'Volume': [1701947843.25, 410741870.10, 31148619.48, 13119614.16, 
-              15022090.45, 28085.00, 43.00, 0.00],
-    'Transactions': [29281, 4547, 203, 173, 42, 42, 4, 0],
-    'Market_Share': [78.36, 18.91, 1.43, 0.60, 0.69, 0.01, 0.00, 0.00]
-})
-
-recipients_data = pd.DataFrame({
-    'Bank': ['ABSA Bank', 'Cooperative Bank', 'DT Bank', 'Equity Bank', 
-            'Family Bank', 'I&M Bank', 'KCB Bank', 'NCBA Bank'],
-    'Volume': [7282025.65, 11802956.97, 7677251.81, 24819864.19,
-              9481656.86, 9501100.76, 17038871.74, 11536537.68],
-    'Transactions': [139, 338, 124, 889, 215, 244, 348, 195],
-    'Market_Share': [6.53, 10.58, 6.88, 22.25, 8.50, 8.52, 15.27, 10.34]
-})
-
-dbc.Col([
-            # Monthly Transaction Analysis Card
+    # Key Metrics Cards
+    dbc.Row([
+        dbc.Col([
             dbc.Card([
-                dbc.CardHeader("Monthly Transaction Analysis"),
+                dbc.CardBody([
+                    html.H5("Total Annual Transactions", className="card-title text-center"),
+                    html.H2(f"{monthly_data['Transactions'].sum():,.0f}", 
+                           className="text-primary text-center"),
+                    html.P([
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"{monthly_data['Transactions'].mean():,.0f}",
+                                className="regular-text text-success")
+                    ], className="text-center")
+                ])
+            ], className="shadow-sm")
+        ]),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("Average Success Rate", className="card-title text-center"),
+                    html.H2([
+                        f"{monthly_data['Success_Rate'].mean():.1f}",
+                        html.Small("%", className="text-muted")
+                    ], className="text-primary text-center"),
+                    html.P([
+                        html.Span("Peak: ", className="regular-text"),
+                        html.Span(f"{monthly_data['Success_Rate'].max():.1f}%",
+                                className="regular-text text-success")
+                    ], className="text-center")
+                ])
+            ], className="shadow-sm")
+        ]),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("Total Volume (KES)", className="card-title text-center"),
+                    html.H2(f"{monthly_data['Volume'].sum()/1e9:.2f}B", 
+                           className="text-primary text-center"),
+                    html.P([
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"KES {monthly_data['Volume'].mean()/1e6:.1f}M",
+                                className="regular-text text-success")
+                    ], className="text-center")
+                ])
+            ], className="shadow-sm")
+        ]),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("Total Unique Remitters", className="card-title text-center"),
+                    html.H2(f"{monthly_data['Unique_Remitters'].max():,.0f}", 
+                           className="text-primary text-center"),
+                    html.P([
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"{monthly_data['Unique_Remitters'].mean():,.0f}",
+                                className="regular-text text-success")
+                    ], className="text-center")
+                ])
+            ], className="shadow-sm")
+        ])
+    ], className="mb-4"),
+
+# Monthly Trends and Performance
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Monthly Volume Trends"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(data=[
@@ -201,26 +233,78 @@ dbc.Col([
                                 line=dict(color='rgb(255, 128, 0)', width=2)
                             )
                         ]).update_layout(
+                            title='Monthly Volume and Success Rate',
                             yaxis=dict(title='Volume (KES Millions)'),
-                            yaxis2=dict(title='Success Rate (%)', 
-                                      overlaying='y', 
-                                      side='right',
-                                      range=[0, 100]),
-                            height=300,
-                            margin=dict(l=50, r=50, t=30, b=50),
+                            yaxis2=dict(
+                                title='Success Rate (%)',
+                                overlaying='y',
+                                side='right',
+                                range=[0, 100]
+                            ),
+                            height=400,
+                            margin=dict(l=50, r=50, t=50, b=50),
                             legend=dict(orientation="h", y=1.1)
+                        )
+                    ),
+                    html.Div([
+                        html.P([
+                            "Peak Month: December 2024 ",
+                            html.Span(f"(KES {monthly_data['Volume'].max()/1e6:.1f}M)",
+                                    className="text-muted")
+                        ], className="mb-0 mt-3 regular-text")
+                    ])
+                ])
+            ], className="shadow-sm mb-4")
+        ], width=12)
+    ], className="mb-4"),
+
+    # User Activity Metrics and Success Rate
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Success Rate Performance"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(
+                            go.Indicator(
+                                mode="gauge+number",
+                                value=monthly_data['Success_Rate'].mean(),
+                                title={"text": "Average Success Rate",
+                                      "font": {"size": 16},
+                                      "align": "center"},
+                                number={"suffix": "%",
+                                       "font": {"size": 28}},
+                                gauge={
+                                    'axis': {'range': [0, 100]},
+                                    'bar': {'color': "rgb(255, 215, 0)"},
+                                    'steps': [
+                                        {'range': [0, 75], 'color': 'rgba(255, 215, 0, 0.2)'},
+                                        {'range': [75, 85], 'color': 'rgba(255, 215, 0, 0.4)'},
+                                        {'range': [85, 100], 'color': 'rgba(255, 215, 0, 0.6)'}
+                                    ],
+                                    'threshold': {
+                                        'line': {'color': "red", 'width': 2},
+                                        'thickness': 0.75,
+                                        'value': monthly_data['Success_Rate'].mean()
+                                    }
+                                },
+                                domain={'x': [0.1, 0.9], 'y': [0, 1]}
+                            )
+                        ).update_layout(
+                            height=300,
+                            margin=dict(l=30, r=30, t=30, b=30)
                         )
                     )
                 ])
-            ], className="shadow-sm mb-4"),
-            
-            # User Activity Metrics Card
+            ], className="shadow-sm")
+        ], width=4),
+
+        dbc.Col([
             dbc.Card([
                 dbc.CardHeader("User Activity Metrics"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(data=[
-                            # Icons
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1.15, 1.15, 1.15],
@@ -230,7 +314,6 @@ dbc.Col([
                                 hoverinfo='none',
                                 showlegend=False
                             ),
-                            # Titles
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1, 1, 1],
@@ -240,42 +323,19 @@ dbc.Col([
                                 hoverinfo='none',
                                 showlegend=False
                             ),
-                            # Current Values
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[0.85, 0.85, 0.85],
                                 mode='text',
-                                text=[str(len(country_data)), 
+                                text=[str(len(country_data)),
                                      f"{monthly_data['Unique_Remitters'].max():,}",
                                      f"{monthly_data['Unique_Recipients'].max():,}"],
                                 textfont=dict(size=24, color='#2E86C1'),
                                 hoverinfo='none',
                                 showlegend=False
-                            ),
-                            # Previous Values
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[0.7, 0.7, 0.7],
-                                mode='text',
-                                text=[f"vs {len(country_data)-1}",
-                                     f"vs {monthly_data['Unique_Remitters'].iloc[0]:,}",
-                                     f"vs {monthly_data['Unique_Recipients'].iloc[0]:,}"],
-                                textfont=dict(size=12, color='#666'),
-                                hoverinfo='none',
-                                showlegend=False
-                            ),
-                            # Change Percentage
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[0.6, 0.6, 0.6],
-                                mode='text',
-                                text=['+11.11%', '+62.89%', '+72.15%'],
-                                textfont=dict(size=14, color=['#28a745', '#28a745', '#28a745']),
-                                hoverinfo='none',
-                                showlegend=False
                             )
                         ]).update_layout(
-                            height=250,
+                            height=300,
                             showlegend=False,
                             xaxis=dict(
                                 showgrid=False,
@@ -308,7 +368,7 @@ dbc.Col([
                     dcc.Graph(
                         figure=go.Figure(data=[
                             go.Bar(
-                                name='Volume (KES)',
+                                name='Volume',
                                 x=daily_data['Day'],
                                 y=daily_data['Volume']/1e6,
                                 marker_color='rgba(26, 118, 255, 0.8)',
@@ -338,13 +398,7 @@ dbc.Col([
                             ),
                             height=350,
                             margin=dict(l=50, r=50, t=50, b=30),
-                            legend=dict(
-                                orientation="h",
-                                yanchor="bottom",
-                                y=1.02,
-                                xanchor="right",
-                                x=1
-                            )
+                            legend=dict(orientation="h", y=1.1)
                         )
                     ),
                     html.Div([
@@ -380,13 +434,7 @@ dbc.Col([
                             margin=dict(l=50, r=50, t=50, b=30),
                             yaxis=dict(type='log'),
                             showlegend=True,
-                            legend=dict(
-                                orientation="h",
-                                yanchor="bottom",
-                                y=1.02,
-                                xanchor="right",
-                                x=1
-                            )
+                            legend=dict(orientation="h", y=1.1)
                         )
                     ),
                     html.Div([
@@ -401,7 +449,7 @@ dbc.Col([
         ], width=6)
     ], className="mb-4"),
 
-# Industry Analysis and Geographic Distribution
+# Industry and Geographic Distribution
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -416,7 +464,7 @@ dbc.Col([
                             color_continuous_scale='Viridis',
                             title='Industry Distribution'
                         ).update_layout(
-                            height=500,
+                            height=450,
                             margin=dict(l=20, r=20, t=40, b=20)
                         )
                     ),
@@ -442,14 +490,31 @@ dbc.Col([
                                 x=country_data['Country'],
                                 y=country_data['Volume_KES']/1e6,
                                 marker_color='rgba(26, 118, 255, 0.8)'
+                            ),
+                            go.Scatter(
+                                name='Transactions',
+                                x=country_data['Country'],
+                                y=country_data['Transactions'],
+                                mode='lines+markers',
+                                marker_color='rgba(255, 128, 0, 0.8)',
+                                yaxis='y2'
                             )
                         ]).update_layout(
-                            title='Volume by Country (KES Millions)',
+                            title='Country-wise Distribution',
+                            yaxis=dict(
+                                title='Volume (KES Millions)',
+                                type='log'
+                            ),
+                            yaxis2=dict(
+                                title='Number of Transactions',
+                                overlaying='y',
+                                side='right',
+                                type='log'
+                            ),
                             xaxis_tickangle=-45,
-                            height=500,
+                            height=450,
                             margin=dict(l=50, r=50, t=50, b=100),
-                            yaxis=dict(type='log'),
-                            showlegend=True
+                            legend=dict(orientation="h", y=1.1)
                         )
                     )
                 ])
@@ -506,7 +571,7 @@ dbc.Col([
                     dcc.Graph(
                         figure=go.Figure(data=[
                             go.Bar(
-                                name='Transaction Volume',
+                                name='Volume',
                                 x=recipients_data['Bank'],
                                 y=recipients_data['Volume']/1e6,
                                 marker_color='rgba(26, 118, 255, 0.8)',
@@ -514,7 +579,7 @@ dbc.Col([
                                 textposition='auto',
                             )
                         ]).update_layout(
-                            title='Bank Recipients - Volume and Market Share',
+                            title='Bank Recipients Volume Distribution',
                             yaxis=dict(title='Volume (KES Millions)'),
                             xaxis_tickangle=-45,
                             height=400,
