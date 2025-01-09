@@ -4,7 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash
 from dash import dcc, html
-from dash.dependencies import Input, Output  # Added this line
+from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 import numpy as np
 import os
@@ -54,119 +54,83 @@ app.index_string = '''<!DOCTYPE html>
     </body>
 </html>'''
 
-# Create DataFrames with the updated data
+# Create DataFrames with the yearly data
 monthly_data = pd.DataFrame({
     'Metric': ['Total Transactions', 'Transaction Volume (KES)', 'Successful Transactions', 
                'Failed Transactions', 'Success Rate (%)', 'Unique Remitters', 
                'Unique Recipients', 'Unique Countries'],
-    'October': [2147, 53713252.25, 2082, 65, 97.0, 987, 740, 6],
-    'November': [3623, 74217693.61, 2794, 829, 77.12, 1270, 945, 7],
-    'Net Change': [1476, 20504441.36, 712, 764, -19.85, 283, 205, 1],
-    'Change %': [68.75, 38.17, 34.20, 1175.38, -20.47, 28.67, 27.70, 16.67]
+    'Annual Total': [38091, 2172008165.44, 34292, 2804.84, 87, 16275, 18225, 16],
+    'Monthly Average': [3174.25, 181000680.45, 2857.67, 233.74, 87, 1356.25, 1518.75, 6.33],
+    'Maximum': [8217, 523575404.54, 7136, 829, 97.6, 3367, 3858, 16],
+    'Minimum': [31, 925.00, 12, 1, 38.7, 3, 6, 2]
 })
 
 failure_data = pd.DataFrame({
     'Reason': ['Insufficient Balance', 'Other', 'System Error', 'Invalid Account', 
-               'Invalid Details', 'General Failure', 'SOAP Error'],
-    'Count': [743, 28, 27, 25, 3, 2, 1],
-    'Percentage': [89.6, 3.4, 3.3, 3.0, 0.4, 0.2, 0.1]
+               'Invalid Credit Party', 'Timed Out', 'General Failure', 'SOAP Error', 'Limit Exceeded'],
+    'Count': [2216, 592, 437, 251, 83, 133, 23, 6, 2],
+    'Percentage': [58.3, 15.6, 11.5, 6.6, 2.2, 3.5, 0.6, 0.2, 0.1]
 })
 
+# Yearly country data
 country_data = pd.DataFrame({
-    'Country': ['United Kingdom', 'United States of America', 'Canada', 
-                'Kenya', 'Tanzania', 'Nigeria', 'Ireland'],
-    'Volume_KES': [39205310.87, 27361525.15, 3819252.06, 
-                   3529435.69, 276744.01, 14050.83, 11375.00],
-    'Transactions': [1520, 870, 187, 208, 4, 3, 2]
+    'Country': ['United Kingdom (GBR)', 'United States (USA)', 'Canada (CAN)', 
+                'Kenya (KEN)', 'Nigeria (NGA)', 'Tanzania (TZA)', 'Others'],
+    'Volume_KES': [961197746.35, 422501849.21, 68916278.01, 
+                   32036111.63, 6352832.02, 391069.01, 211543.12],
+    'Transactions': [18050, 7906, 1842, 1339, 395, 6, 18]
 })
 
-# Category data
+# Category data for the entire year
 category_data = pd.DataFrame({
     'Category': ['Banking', 'Other', 'Savings', 'Securities & Insurance', 
-                'Retail & Grocery', 'Real Estate', 'Energy & Heavy Industry',
-                'Hospitality', 'Medical', 'Government', 'Religious',
-                'Education', 'Telco & Tech'],
-    'Amount': [41087679.23, 10946152.12, 10078434.28, 4377020.59,
-               3864372.86, 743588.00, 207532.04, 761827.55,
-               956800.17, 316738.20, 625748.03, 218467.00, 33333.54]
+                'Real Estate', 'Retail & Grocery', 'Religious', 'Education',
+                'Hospitality', 'Energy & Heavy Industry', 'Medical', 'Government',
+                'Telco & Tech'],
+    'Amount': [134495270.02, 1461861363.64, 44181713.27, 19007552.35,
+               30405803.67, 10461967.57, 4470010.73, 4785022.56,
+               3771930.72, 1812760.27, 1829661.46, 515721.32,
+               389141.00]
 })
 
-# Top 5 entities data structure for all categories
-top5_data = {
-    'Banking': {
-        'Entity': ['EQUITY BANK', 'KCB BANK', 'IM BANK', 'NCBA BANK', 'FAMILY BANK'],
-        'Amount': [8431804.50, 7507623.85, 4628412.47, 4195733.53, 3421604.24]
-    },
-    'Other': {
-        'Entity': ['NAIROBI DECEMBER CONVENTION', 'FAIRPRICE ENTERPRISES DAGORETI', 
-                  'TILE CARPET CENTRE', 'LOOP', 'HOT POINT APPLIANCES'],
-        'Amount': [976775.00, 954412.50, 864025.00, 451092.00, 379754.40]
-    },
-    'Savings': {
-        'Entity': ['KENVERSITY SACCO', 'STIMA SACCO', 'CIC MMF', 'DIMKES SACCO', 'HAZINA SACCO'],
-        'Amount': [939890.98, 903764.87, 875772.55, 718793.60, 653496.25]
-    },
-    'Securities & Insurance': {
-        'Entity': ['ETICA CAPITAL', 'SANLAM UNIT TRUST', 'AIB CAPITAL', 
-                  'BRITAM LIFE ASSURANCE', 'ICEA LION LIFE ASSURANCE'],
-        'Amount': [1539530.36, 393174.00, 379548.01, 348735.65, 236731.72]
-    },
-    'Retail & Grocery': {
-        'Entity': ['NAFUU CLASSIC GENERAL HARDWARE', 'MWENDANTU STORES', 
-                  'RACHAEL HARDWARE', 'EAGLE HARDWARE DEALERS', 'MACHE HARDWARE STORES'],
-        'Amount': [1376040.80, 416050.00, 250200.00, 230375.00, 218120.00]
-    },
-    'Real Estate': {
-        'Entity': ['AMG REALTORS', 'BUXTON POINT APARTMENT', 'OPTIVEN', 
-                  'ICEA LION ASSET MANAGEMENT', 'MUGUMO GREENS MANAGEMENT'],
-        'Amount': [296261.00, 156275.00, 148925.50, 68101.50, 36000.00]
-    },
-    'Energy & Heavy Industry': {
-        'Entity': ['CANADIANSOLAR ENERGY', 'JEMYSUN ENERGY SOLUTIONS', 'RUBIS ENERGY', 
-                  'KARUNA CORNERSTONE ENERGY', 'SIRIKWA QUARRY'],
-        'Amount': [84000.00, 56492.00, 15145.30, 10000.00, 8330.00]
-    },
-    'Hospitality': {
-        'Entity': ['SERENA HOTELS', 'BONFIRE ADVENTURE YALA TOWER', 
-                  'BONFIRE ADVENTURES WARWICK', 'PLAZA BEACH HOTEL', 'MERIDIAN HOTEL'],
-        'Amount': [412500.00, 98000.00, 72991.00, 40000.00, 27310.50]
-    },
-    'Medical': {
-        'Entity': ['JUBILEE HEALTH INSURANCE', 'JOBS MEDICAL FUND', 
-                  'GURU NANAK RAMGARHIA SIKH HOSPITAL', 'AIC KIJABE HOSPITAL', 'FRANCIS COMMUNITY HOSPITAL'],
-        'Amount': [173705.67, 172353.00, 124876.00, 101986.00, 81760.00]
-    },
-    'Government': {
-        'Entity': ['ECITIZEN', 'KIAMBU COUNTY GOVERNMENT REVENUE', 
-                  'COUNTY HARDWARE AND TIMBER MERCHANTS', 'NAIROBI CITY COUNTY REVENUE', 
-                  'MURANGA COUNTY CREAMERIES COOP UNION'],
-        'Amount': [166508.00, 123469.08, 15881.12, 10000.00, 880.00]
-    },
-    'Religious': {
-        'Entity': ['CRY OF THE SPIRIT MINISTRY', 'DELIVERANCE CHURCH', 
-                  'RUIRU CATHOLIC FUND', 'PARKLANDS BAPTIST CHURCH', 'FAITH EVANGELISTIC MINISTRY'],
-        'Amount': [77100.00, 75174.00, 67599.23, 54315.00, 50750.00]
-    },
-    'Education': {
-        'Entity': ['DAYSTAR UNIVERSITY', 'KABARAK UNIVERSITY', 'MOUNT UNIVERSITY', 
-                  'CLARES KAPLONG SCHOOL OF NURSING', 'BORN TO LEAD ACADEMY'],
-        'Amount': [104640.00, 48850.00, 39812.00, 8150.00, 4500.00]
-    },
-    'Telco & Tech': {
-        'Entity': ['SAFARICOM POST PAID', 'SAFARICOM RETAIL KIMATHI', 'MTAANI TELECOM', 
-                  'KONNECT DATA NETWORKS', 'VILCOM NETWORKS'],
-        'Amount': [17030.00, 5150.00, 4000.00, 2000.00, 1999.00]
-    }
-}
+# Client data structure
+client_data = pd.DataFrame({
+    'Client': ['Lemfi', 'DLocal', 'Tangent', 'Nala', 'Wapipay', 'Brij', 
+              'Cellulant', 'Others'],
+    'Volume': [1701947843.25, 410741870.10, 31148619.48, 13119614.16, 
+              15022090.45, 28085.00, 43.00, 0.00],
+    'Transactions': [29281, 4547, 203, 173, 42, 42, 4, 0],
+    'Market_Share': [78.36, 18.91, 1.43, 0.60, 0.69, 0.01, 0.00, 0.00]
+})
 
-# Create a DataFrame for hourly data
+# Recipients data structure (banks and transaction volumes)
+recipients_data = pd.DataFrame({
+    'Bank': ['ABSA Bank', 'Cooperative Bank', 'DT Bank', 'Equity Bank', 
+            'Family Bank', 'I&M Bank', 'KCB Bank', 'NCBA Bank'],
+    'Volume': [7282025.65, 11802956.97, 7677251.81, 24819864.19,
+              9481656.86, 9501100.76, 17038871.74, 11536537.68],
+    'Transactions': [139, 338, 124, 889, 215, 244, 348, 195],
+    'Market_Share': [6.53, 10.58, 6.88, 22.25, 8.50, 8.52, 15.27, 10.34]
+})
+
+# Private Individual transactions
+private_individual_data = pd.DataFrame({
+    'Month': ['January', 'February', 'March'],
+    'Volume': [956150.00, 1762875.00, 3089338.00],
+    'Transactions': [6, 6, 13]
+})
+
+# Hourly distribution data (aggregated for the year)
 hourly_data = pd.DataFrame({
     'Hour': [f'{i:02d}:00' for i in range(24)],
-    'Volume': np.random.exponential(scale=5000000, size=24)
+    'Volume': [
+        27533935.96, 28073270.30, 29035102.50, 24136418.10, 20726459.19,
+        18337660.33, 31046599.22, 18624343.36, 17163342.76, 17538441.06,
+        15470631.39, 18356204.26, 18473250.50, 16966374.97, 21376240.02,
+        24886442.52, 26430533.46, 36983605.96, 32593463.80, 33624440.10,
+        35671112.12, 41021127.01, 41365601.43, 47980870.44
+    ]
 })
-# Set known peak and minimum
-hourly_data.loc[15, 'Volume'] = 860802.12  # 3:00 PM peak
-hourly_data.loc[23, 'Volume'] = 100.00     # 11:00 PM minimum
 
 # App Layout
 app.layout = dbc.Container([
@@ -178,7 +142,7 @@ app.layout = dbc.Container([
                      className='logo', 
                      style={'height': '150px', 'object-fit': 'contain'})
             ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
-            html.H1("November Business Transfer Analysis", 
+            html.H1("2024 Annual Business Transfer Analysis", 
                    className="text-primary text-center mb-4",
                    style={'letterSpacing': '2px'})
         ])
@@ -189,12 +153,12 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Total Transactions", className="card-title text-center"),
-                    html.H2(f"{monthly_data.loc[0, 'November']:,.0f}", 
+                    html.H5("Total Annual Transactions", className="card-title text-center"),
+                    html.H2(f"{monthly_data.loc[0, 'Annual Total']:,.0f}", 
                            className="text-primary text-center"),
                     html.P([
-                        html.Span("MoM Change: ", className="regular-text"),
-                        html.Span(f"+{monthly_data.loc[0, 'Change %']}%",
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"{monthly_data.loc[0, 'Monthly Average']:,.0f}",
                                 className="regular-text text-success")
                     ], className="text-center")
                 ])
@@ -203,28 +167,14 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Success Rate", className="card-title text-center"),
+                    html.H5("Average Success Rate", className="card-title text-center"),
                     html.H2([
-                        f"{monthly_data.loc[4, 'November']}",
+                        f"{monthly_data.loc[4, 'Annual Total']}",
                         html.Small("%", className="text-muted")
                     ], className="text-primary text-center"),
                     html.P([
-                        html.Span("MoM Change: ", className="regular-text"),
-                        html.Span(f"{monthly_data.loc[4, 'Change %']}%",
-                                className="regular-text text-danger")
-                    ], className="text-center")
-                ])
-            ], className="shadow-sm")
-        ]),
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("Volume (KES)", className="card-title text-center"),
-                    html.H2(f"{monthly_data.loc[1, 'November']/1e6:.1f}M", 
-                           className="text-primary text-center"),
-                    html.P([
-                        html.Span("MoM Change: ", className="regular-text"),
-                        html.Span(f"+{monthly_data.loc[1, 'Change %']}%",
+                        html.Span("Peak: ", className="regular-text"),
+                        html.Span(f"{monthly_data.loc[4, 'Maximum']}%",
                                 className="regular-text text-success")
                     ], className="text-center")
                 ])
@@ -233,76 +183,90 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Unique Remitters", className="card-title text-center"),
-                    html.H2(f"{monthly_data.loc[5, 'November']:,.0f}", 
+                    html.H5("Total Volume (KES)", className="card-title text-center"),
+                    html.H2(f"{monthly_data.loc[1, 'Annual Total']/1e9:.2f}B", 
                            className="text-primary text-center"),
                     html.P([
-                        html.Span("MoM Change: ", className="regular-text"),
-                        html.Span(f"+{monthly_data.loc[5, 'Change %']}%",
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"KES {monthly_data.loc[1, 'Monthly Average']/1e6:.1f}M",
+                                className="regular-text text-success")
+                    ], className="text-center")
+                ])
+            ], className="shadow-sm")
+        ]),
+        dbc.Col([
+            dbc.Card([
+                dbc.CardBody([
+                    html.H5("Total Unique Remitters", className="card-title text-center"),
+                    html.H2(f"{monthly_data.loc[5, 'Annual Total']:,.0f}", 
+                           className="text-primary text-center"),
+                    html.P([
+                        html.Span("Monthly Average: ", className="regular-text"),
+                        html.Span(f"{monthly_data.loc[5, 'Monthly Average']:,.0f}",
                                 className="regular-text text-success")
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
         ])
-    ], className="mb-4"),
+    ], className="mb-4")
 
-    # Main Charts Row
+# Monthly Performance Charts Row
     dbc.Row([
-        # Left Column
+        # Left Column - Monthly Stats
         dbc.Col([
-            # Daily Transaction Volume Card
+            # Monthly Transaction Volume Card
             dbc.Card([
-                dbc.CardHeader("Daily Transaction Volume"),
+                dbc.CardHeader("Annual Performance Metrics"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(
                             data=[
                                 go.Indicator(
                                     mode="number",
-                                    value=4.53,  # Peak daily volume
+                                    value=523575404.54,  # Peak monthly volume
                                     number={"prefix": "KES ", "suffix": "M",
                                            "valueformat": ".1f",
                                            "font": {"size": 24}},
-                                    title={"text": "Peak Daily Volume",
+                                    title={"text": "Peak Monthly Volume",
                                            "font": {"size": 14},
                                            "align": "center"},
                                     domain={'x': [0.05, 0.45], 'y': [0.65, 0.95]}
                                 ),
                                 go.Indicator(
                                     mode="number",
-                                    value=2.47,  # Average daily volume
+                                    value=181000680.45,  # Average monthly volume
                                     number={"prefix": "KES ", "suffix": "M",
                                            "valueformat": ".1f",
                                            "font": {"size": 24}},
-                                    title={"text": "Average Daily Volume",
+                                    title={"text": "Average Monthly Volume",
                                            "font": {"size": 14},
                                            "align": "center"},
                                     domain={'x': [0.55, 0.95], 'y': [0.65, 0.95]}
                                 ),
                                 go.Indicator(
                                     mode="number",
-                                    value=829,  # Peak daily transactions
+                                    value=8217,  # Peak monthly transactions
                                     number={"valueformat": ",",
                                            "font": {"size": 24}},
-                                    title={"text": "Peak Daily Transactions",
+                                    title={"text": "Peak Monthly Transactions",
                                            "font": {"size": 14},
                                            "align": "center"},
                                     domain={'x': [0.05, 0.45], 'y': [0.375, 0.625]}
                                 ),
                                 go.Indicator(
                                     mode="number",
-                                    value=121,
+                                    value=3174,  # Average monthly transactions
                                     number={"valueformat": ",",
                                            "font": {"size": 24}},
-                                    title={"text": "Average Daily Transactions",
+                                    title={"text": "Average Monthly Transactions",
                                            "font": {"size": 14},
                                            "align": "center"},
                                     domain={'x': [0.55, 0.95], 'y': [0.375, 0.625]}
                                 ),
                                 go.Indicator(
                                     mode="gauge+number",
-                                    value=77.12,  # Success rate
-                                    title={"text": "Daily Success Rate",
+                                    value=87,  # Annual average success rate
+                                    title={"text": "Annual Success Rate",
                                            "font": {"size": 16},
                                            "align": "center"},
                                     number={"suffix": "%",
@@ -318,7 +282,7 @@ app.layout = dbc.Container([
                                         'threshold': {
                                             'line': {'color': "red", 'width': 2},
                                             'thickness': 0.75,
-                                            'value': 77.12
+                                            'value': 87
                                         }
                                     },
                                     domain={'x': [0.15, 0.85], 'y': [0.02, 0.32]}
@@ -334,8 +298,8 @@ app.layout = dbc.Container([
                     html.Div([
                         dbc.Row([
                             dbc.Col([
-                                html.P("Peak Volume Day: November 29, 2024", className="regular-text mb-1"),
-                                html.P("Lowest Volume Day: November 20, 2024 (KES 612K)", className="regular-text mb-0")
+                                html.P("Peak Month: December 2024", className="regular-text mb-1"),
+                                html.P("Lowest Month: July 2024 (KES 925.00)", className="regular-text mb-0")
                             ])
                         ])
                     ], className="small")
@@ -344,12 +308,12 @@ app.layout = dbc.Container([
 
             # Hourly Distribution Card
             dbc.Card([
-                dbc.CardHeader("Hourly Distribution"),
+                dbc.CardHeader("Average Hourly Distribution"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=px.line(
                             hourly_data, x='Hour', y='Volume',
-                            title='Hourly Transaction Volume'
+                            title='Average Hourly Transaction Volume'
                         ).update_layout(
                             yaxis_type="log",
                             showlegend=False,
@@ -360,112 +324,63 @@ app.layout = dbc.Container([
             ], className="shadow-sm")
         ], width=4),
 
-        # Right Column
+        # Right Column - Monthly Trends
         dbc.Col([
-            # Transaction Success Analysis Card
+            # Monthly Transaction Success Analysis Card
             dbc.Card([
-                dbc.CardHeader("Transaction Success Analysis"),
+                dbc.CardHeader("Monthly Transaction Analysis"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(data=[
                             go.Bar(
-                                name='Successful',
-                                x=['October', 'November'],
-                                y=[monthly_data.loc[2, 'October'], monthly_data.loc[2, 'November']],
+                                name='Volume (KES Millions)',
+                                x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                y=[296.56, 276.36, 278.04, 280.44, 223.58, 143.37,
+                                   0.001, 0.004, 22.14, 53.71, 74.22, 523.58],
                                 marker_color='rgb(40, 167, 69)'
                             ),
-                            go.Bar(
-                                name='Failed',
-                                x=['October', 'November'],
-                                y=[monthly_data.loc[3, 'October'], monthly_data.loc[3, 'November']],
-                                marker_color='rgb(220, 53, 69)'
+                            go.Scatter(
+                                name='Success Rate (%)',
+                                x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                y=[96.5, 96.1, 85.2, 91.7, 96.2, 92.0,
+                                   38.7, 97.6, 86.6, 97.0, 77.1, 86.8],
+                                yaxis='y2',
+                                line=dict(color='rgb(255, 128, 0)', width=2)
                             )
                         ]).update_layout(
-                            barmode='stack',
+                            yaxis=dict(title='Volume (KES Millions)'),
+                            yaxis2=dict(title='Success Rate (%)', 
+                                      overlaying='y', 
+                                      side='right',
+                                      range=[0, 100]),
                             height=550,
-                            title="Success vs Failure Comparison"
+                            title="Monthly Volume and Success Rate"
                         )
                     )
                 ])
             ], className="shadow-sm mb-4"),
             
-            # User Activity Metrics Card
+            # Monthly User Activity Card
             dbc.Card([
-                dbc.CardHeader("User Activity Metrics"),
+                dbc.CardHeader("Monthly User Activity"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=go.Figure(data=[
-                            # First row - Icons
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[1.15, 1.15, 1.15],
-                                mode='text',
-                                text=['🌍', '👥', '👤'],
-                                textfont=dict(size=24),
-                                hoverinfo='none',
-                                showlegend=False
-                            ),
-                            # Second row - Titles
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[1, 1, 1],
-                                mode='text',
-                                text=['Active Countries', 'Unique Remitters', 'Unique Recipients'],
-                                textfont=dict(size=14),
-                                hoverinfo='none',
-                                showlegend=False
-                            ),
-                            # Third row - Current Values
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[0.85, 0.85, 0.85],
-                                mode='text',
-                                text=['7', '1,270', '945'],
-                                textfont=dict(size=24, color='#2E86C1'),
-                                hoverinfo='none',
-                                showlegend=False
-                            ),
-                            # Fourth row - Previous Values
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[0.7, 0.7, 0.7],
-                                mode='text',
-                                text=['vs 6', 'vs 987', 'vs 740'],
-                                textfont=dict(size=12, color='#666'),
-                                hoverinfo='none',
-                                showlegend=False
-                            ),
-                            # Fifth row - Change Percentage
-                            go.Scatter(
-                                x=[0.2, 0.5, 0.8],
-                                y=[0.6, 0.6, 0.6],
-                                mode='text',
-                                text=['+16.67%', '+28.67%', '+27.70%'],
-                                textfont=dict(
-                                    size=14,
-                                    color=['#28a745', '#28a745', '#28a745']
-                                ),
-                                hoverinfo='none',
-                                showlegend=False
-                            )
-                        ]).update_layout(
-                            height=350,
-                            showlegend=False,
-                            xaxis=dict(
-                                showgrid=False,
-                                zeroline=False,
-                                showticklabels=False,
-                                range=[0, 1]
-                            ),
-                            yaxis=dict(
-                                showgrid=False,
-                                zeroline=False,
-                                showticklabels=False,
-                                range=[0.5, 1.2]
-                            ),
-                            margin=dict(l=20, r=20, t=20, b=20),
-                            paper_bgcolor='white',
-                            plot_bgcolor='white'
+                        figure=px.line(
+                            pd.DataFrame({
+                                'Month': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                                'Remitters': [2067, 1762, 1688, 2120, 1309, 1169,
+                                            3, 4, 529, 987, 1270, 3367],
+                                'Recipients': [2241, 2080, 2136, 2381, 1865, 1539,
+                                             6, 14, 420, 740, 945, 3858]
+                            }),
+                            x='Month',
+                            y=['Remitters', 'Recipients'],
+                            title="Monthly Active Users"
+                        ).update_layout(
+                            height=300
                         )
                     )
                 ])
@@ -473,7 +388,7 @@ app.layout = dbc.Container([
         ], width=8)
     ], className="mb-4"),
 
-    # Geographic Distribution
+# Geographic Distribution
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -514,7 +429,7 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("Failure Analysis"),
+                dbc.CardHeader("Annual Failure Analysis"),
                 dbc.CardBody([
                     dcc.Graph(
                         figure=px.treemap(
@@ -537,49 +452,88 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardHeader("Client Market Share"),
                 dbc.CardBody([
-                    html.Img(
-                        src='/assets/LEMFI.png',
-                        style={
-                            'width': '50%',
-                            'display': 'block',
-                            'margin': 'auto'
-                        }
+                    dcc.Graph(
+                        figure=px.pie(
+                            client_data,
+                            values='Volume',
+                            names='Client',
+                            title='Transaction Volume by Client',
+                            hover_data=['Transactions', 'Market_Share']
+                        ).update_layout(
+                            height=400
+                        )
                     ),
-                    html.H3(
-                        "100% Market Share",
-                        className="text-center mt-4",
-                        style={'color': '#1a76ff'}
-                    ),
-                    html.P(
-                        f"Total Volume: KES {74217693.61:,.2f}",
-                        className="text-center regular-text"
-                    ),
-                    html.P(
-                        "Total Transactions: 2,794",
-                        className="text-center regular-text"
-                    )
+                    html.Div([
+                        html.Div([
+                            html.Img(
+                                src=f'/assets/{client.lower()}.png',
+                                style={
+                                    'width': '60px',
+                                    'height': '60px',
+                                    'objectFit': 'contain',
+                                    'margin': '5px'
+                                }
+                            ) for client in client_data['Client']
+                        ], style={
+                            'display': 'flex',
+                            'flexWrap': 'wrap',
+                            'justifyContent': 'center',
+                            'alignItems': 'center',
+                            'marginTop': '20px'
+                        })
+                    ])
                 ])
             ], className="shadow-sm")
         ], width=6)
     ], className="mb-4"),
 
-    # New Category Overview and Top 5 Entities
+# Bank Recipients Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("Category Overview"),
+                dbc.CardHeader("Bank Recipients Overview"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=px.treemap(
-                            category_data,
-                            path=['Category'],
-                            values='Amount',
-                            color='Amount',
-                            color_continuous_scale='Viridis',
-                            title='Transaction Volume by Category'
-                        ).update_layout(
+                        figure=go.Figure(data=[
+                            go.Bar(
+                                name='Transaction Volume',
+                                x=recipients_data['Bank'],
+                                y=recipients_data['Volume'],
+                                marker_color='rgba(26, 118, 255, 0.8)',
+                                yaxis='y'
+                            ),
+                            go.Scatter(
+                                name='Market Share (%)',
+                                x=recipients_data['Bank'],
+                                y=recipients_data['Market_Share'],
+                                mode='lines+markers',
+                                marker_color='rgb(255, 128, 0)',
+                                yaxis='y2'
+                            )
+                        ]).update_layout(
+                            title='Bank Recipients - Volume vs Market Share',
+                            yaxis=dict(
+                                title='Volume (KES)',
+                                titlefont=dict(color='rgba(26, 118, 255, 0.8)'),
+                                tickfont=dict(color='rgba(26, 118, 255, 0.8)')
+                            ),
+                            yaxis2=dict(
+                                title='Market Share (%)',
+                                titlefont=dict(color='rgb(255, 128, 0)'),
+                                tickfont=dict(color='rgb(255, 128, 0)'),
+                                overlaying='y',
+                                side='right'
+                            ),
+                            xaxis_tickangle=-45,
                             height=500,
-                            margin=dict(l=20, r=20, t=40, b=20)
+                            margin=dict(l=50, r=50, t=50, b=100),
+                            legend=dict(
+                                orientation="h",
+                                yanchor="bottom",
+                                y=1.02,
+                                xanchor="right",
+                                x=1
+                            )
                         )
                     )
                 ])
@@ -588,21 +542,108 @@ app.layout = dbc.Container([
         
         dbc.Col([
             dbc.Card([
-                dbc.CardHeader("Top 5 Entities by Category"),
+                dbc.CardHeader("Transaction Distribution by Bank"),
                 dbc.CardBody([
-                    dcc.Dropdown(
-                        id='category-dropdown',
-                        options=[{'label': cat, 'value': cat} for cat in top5_data.keys()],
-                        value='Banking',  # Default value
-                        className='mb-3'
-                    ),
-                    dcc.Graph(id='top5-graph')
+                    dcc.Graph(
+                        figure=px.pie(
+                            recipients_data,
+                            values='Transactions',
+                            names='Bank',
+                            title='Transaction Count Distribution',
+                            hover_data=['Volume', 'Market_Share']
+                        ).update_layout(
+                            height=500,
+                            margin=dict(l=20, r=20, t=50, b=50)
+                        )
+                    )
+                ])
+            ], className="shadow-sm")
+        ], width=6)
+    ], className="mb-4"),
+
+    # Transaction Volume and Private Individual Analysis
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Recipients Transaction Metrics"),
+                dbc.CardBody([
+                    html.Div([
+                        dbc.Row([
+                            dbc.Col([
+                                html.H4("Key Statistics", className="text-center mb-4"),
+                                html.Div([
+                                    html.P([
+                                        "Highest Volume Bank: ",
+                                        html.Span("Equity Bank", className="font-weight-bold"),
+                                        f" (KES {24819864.19:,.2f})"
+                                    ], className="mb-2"),
+                                    html.P([
+                                        "Most Transactions: ",
+                                        html.Span("889", className="font-weight-bold"),
+                                        " (Equity Bank)"
+                                    ], className="mb-2"),
+                                    html.P([
+                                        "Average Transaction Value: ",
+                                        html.Span(f"KES {recipients_data['Volume'].sum() / recipients_data['Transactions'].sum():,.2f}", 
+                                                className="font-weight-bold")
+                                    ], className="mb-2"),
+                                    html.Hr(),
+                                    html.H5("Private Individual Transactions", className="mt-3 mb-3"),
+                                    html.P([
+                                        "Total Volume: ",
+                                        html.Span(f"KES {private_individual_data['Volume'].sum():,.2f}",
+                                                className="font-weight-bold")
+                                    ], className="mb-2"),
+                                    html.P([
+                                        "Total Transactions: ",
+                                        html.Span(str(private_individual_data['Transactions'].sum()),
+                                                className="font-weight-bold")
+                                    ], className="mb-2")
+                                ], className="p-3 border rounded")
+                            ])
+                        ])
+                    ])
+                ])
+            ], className="shadow-sm")
+        ], width=6),
+        
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Private Individual Transactions Trend"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(data=[
+                            go.Bar(
+                                name='Volume',
+                                x=private_individual_data['Month'],
+                                y=private_individual_data['Volume'],
+                                marker_color='rgba(26, 118, 255, 0.8)'
+                            ),
+                            go.Scatter(
+                                name='Transactions',
+                                x=private_individual_data['Month'],
+                                y=private_individual_data['Transactions'],
+                                mode='lines+markers',
+                                marker_color='rgb(255, 128, 0)',
+                                yaxis='y2'
+                            )
+                        ]).update_layout(
+                            title='Private Individual Transaction Trends',
+                            yaxis=dict(title='Volume (KES)'),
+                            yaxis2=dict(
+                                title='Number of Transactions',
+                                overlaying='y',
+                                side='right'
+                            ),
+                            height=500,
+                            margin=dict(l=50, r=50, t=50, b=50),
+                            legend=dict(orientation="h", y=1.1)
+                        )
+                    )
                 ])
             ], className="shadow-sm")
         ], width=6)
     ], className="mb-4")
-
-], fluid=True, className="p-4")
 
 # Callback for Top 5 Entities Graph
 @app.callback(
