@@ -276,11 +276,11 @@ app.layout = dbc.Container([
                                        "font": {"size": 28}},
                                 gauge={
                                     'axis': {'range': [0, 100]},
-                                    'bar': {'color': "rgb(255, 215, 0)"},
+                                    'bar': {'color': "#90EE90"},
                                     'steps': [
-                                        {'range': [0, 75], 'color': 'rgba(255, 215, 0, 0.2)'},
-                                        {'range': [75, 85], 'color': 'rgba(255, 215, 0, 0.4)'},
-                                        {'range': [85, 100], 'color': 'rgba(255, 215, 0, 0.6)'}
+                                        {'range': [0, 75], 'color': 'rgba(144, 238, 144, 0.2)'},
+                                        {'range': [75, 85], 'color': 'rgba(144, 238, 144, 0.4)'},
+                                        {'range': [85, 100], 'color': 'rgba(144, 238, 144, 0.6)'}
                                     ],
                                     'threshold': {
                                         'line': {'color': "red", 'width': 2},
@@ -305,6 +305,7 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(data=[
+                            # Icons
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1.15, 1.15, 1.15],
@@ -314,23 +315,37 @@ app.layout = dbc.Container([
                                 hoverinfo='none',
                                 showlegend=False
                             ),
+                            # Titles
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1, 1, 1],
                                 mode='text',
-                                text=['Active Countries', 'Unique Remitters', 'Unique Recipients'],
+                                text=['Active Countries', 'Total Remitters', 'Total Recipients'],
                                 textfont=dict(size=14),
                                 hoverinfo='none',
                                 showlegend=False
                             ),
+                            # Current Values
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[0.85, 0.85, 0.85],
                                 mode='text',
-                                text=[str(len(country_data)),
-                                     f"{monthly_data['Unique_Remitters'].max():,}",
-                                     f"{monthly_data['Unique_Recipients'].max():,}"],
+                                text=[str(len(country_data)), 
+                                     f"{monthly_data['Unique_Remitters'].sum():,}",
+                                     f"{monthly_data['Unique_Recipients'].sum():,}"],
                                 textfont=dict(size=24, color='#2E86C1'),
+                                hoverinfo='none',
+                                showlegend=False
+                            ),
+                            # Previous Values
+                            go.Scatter(
+                                x=[0.2, 0.5, 0.8],
+                                y=[0.7, 0.7, 0.7],
+                                mode='text',
+                                text=[f"vs {len(country_data)-1}",
+                                     f"vs {monthly_data['Unique_Remitters'].iloc[0]:,}",
+                                     f"vs {monthly_data['Unique_Recipients'].iloc[0]:,}"],
+                                textfont=dict(size=12, color='#666'),
                                 hoverinfo='none',
                                 showlegend=False
                             )
@@ -522,20 +537,21 @@ app.layout = dbc.Container([
     ], className="mb-4"),
 
 # For the Client Market Share section:
-    # Client Market Share Section
+# Client Market Share and Failure Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Client Market Share"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=go.Figure(go.Treemap(
+                        figure=go.Figure(data=[go.Pie(
                             labels=client_data['Client'],
-                            parents=[''] * len(client_data),
                             values=client_data['Volume'],
-                            textinfo='label+value+percent root',
-                            hovertemplate='<b>%{label}</b><br>Volume: KES %{value:,.2f}<br>Share: %{percentRoot:.1%}<extra></extra>'
-                        )).update_layout(
+                            textinfo='label+percent',
+                            hovertemplate='<b>%{label}</b><br>' +
+                                        'Volume: KES %{value:,.2f}<br>' +
+                                        'Share: %{percent}<extra></extra>'
+                        )]).update_layout(
                             height=400,
                             margin=dict(l=20, r=20, t=40, b=20)
                         )
@@ -562,6 +578,34 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=6),
+        
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Annual Failure Analysis"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(go.Treemap(
+                            labels=failure_data['Reason'],
+                            parents=[''] * len(failure_data),
+                            values=failure_data['Count'],
+                            textinfo='label+value+percent parent',
+                            hovertemplate='<b>%{label}</b><br>' +
+                                        'Count: %{value}<br>' +
+                                        'Percentage: %{percentParent:.1%}<extra></extra>',
+                            marker=dict(
+                                colors=failure_data['Count'],
+                                colorscale='Reds',
+                                showscale=True
+                            )
+                        )).update_layout(
+                            height=400,
+                            margin=dict(l=20, r=20, t=40, b=20)
+                        )
+                    )
+                ])
+            ], className="shadow-sm")
+        ], width=6)
+    ], className="mb-4")
         
         dbc.Col([
             dbc.Card([
