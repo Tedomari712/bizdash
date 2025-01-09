@@ -747,7 +747,7 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-    # Bank Recipients Analysis
+# Bank Recipients Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -786,30 +786,32 @@ app.layout = dbc.Container([
                         # Bank logos column
                         dbc.Col([
                             html.Div([
-                                html.Div([
-                                    html.Img(
-                                        src=f'/assets/banks/{name.lower().replace(" ", "_")}.png',
-                                        style={
-                                            'width': '100px',
-                                            'height': '40px',
-                                            'objectFit': 'contain',
-                                            'margin': '5px',
-                                            'backgroundColor': '#f8f9fa',
-                                            'borderRadius': '5px',
-                                            'padding': '5px'
-                                        }
-                                    ),
+                                *[
                                     html.Div([
-                                        f"KES {row['Volume']/1e6:.1f}M",
-                                        html.Br(),
-                                        f"({row['Market_Share']:.1f}%)"
-                                    ], className="text-muted small text-center")
-                                ], style={
-                                    'marginBottom': '10px',
-                                    'display': 'flex',
-                                    'flexDirection': 'column',
-                                    'alignItems': 'center'
-                                }) for name in recipients_data['Bank']
+                                        html.Img(
+                                            src=f'/assets/banks/{bank.lower().replace(" ", "_")}.png',
+                                            style={
+                                                'width': '100px',
+                                                'height': '40px',
+                                                'objectFit': 'contain',
+                                                'margin': '5px',
+                                                'backgroundColor': '#f8f9fa',
+                                                'borderRadius': '5px',
+                                                'padding': '5px'
+                                            }
+                                        ),
+                                        html.Div([
+                                            f"KES {recipients_data.loc[recipients_data['Bank'] == bank, 'Volume'].iloc[0]/1e6:.1f}M",
+                                            html.Br(),
+                                            f"({recipients_data.loc[recipients_data['Bank'] == bank, 'Market_Share'].iloc[0]:.1f}%)"
+                                        ], className="text-muted small text-center")
+                                    ], style={
+                                        'marginBottom': '10px',
+                                        'display': 'flex',
+                                        'flexDirection': 'column',
+                                        'alignItems': 'center'
+                                    }) for bank in recipients_data['Bank']
+                                ]
                             ], style={
                                 'display': 'flex',
                                 'flexDirection': 'column',
