@@ -449,28 +449,22 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Industry and Geographic Distribution
-# For the Industry Analysis section:
+# Industry Analysis Section
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Transaction Volume by Industry"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=go.Figure(data=[
-                            go.Bar(
-                                x=industry_data['Industry'],
-                                y=industry_data['Volume']/1e6,
-                                marker_color='rgba(26, 118, 255, 0.8)'
-                            )
-                        ]).update_layout(
-                            title='Industry Distribution',
-                            xaxis_title='Industry',
-                            yaxis_title='Volume (KES Millions)',
-                            xaxis_tickangle=-45,
+                        figure=go.Figure(go.Treemap(
+                            labels=industry_data['Industry'],
+                            parents=[''] * len(industry_data),
+                            values=industry_data['Volume'],
+                            textinfo='label+value',
+                            hovertemplate='<b>%{label}</b><br>Volume: KES %{value:,.2f}<extra></extra>'
+                        )).update_layout(
                             height=450,
-                            margin=dict(l=50, r=50, t=50, b=100),
-                            yaxis_type='log'
+                            margin=dict(l=20, r=20, t=40, b=20)
                         )
                     ),
                     html.Div([
@@ -528,23 +522,20 @@ app.layout = dbc.Container([
     ], className="mb-4"),
 
 # For the Client Market Share section:
+    # Client Market Share Section
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Client Market Share"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=go.Figure(data=[
-                            go.Pie(
-                                labels=client_data['Client'],
-                                values=client_data['Volume'],
-                                hovertemplate="<b>%{label}</b><br>" +
-                                            "Volume: KES %{value:,.0f}<br>" +
-                                            "Market Share: %{percent}<br>" +
-                                            "<extra></extra>"
-                            )
-                        ]).update_layout(
-                            title='Transaction Volume by Client',
+                        figure=go.Figure(go.Treemap(
+                            labels=client_data['Client'],
+                            parents=[''] * len(client_data),
+                            values=client_data['Volume'],
+                            textinfo='label+value+percent root',
+                            hovertemplate='<b>%{label}</b><br>Volume: KES %{value:,.2f}<br>Share: %{percentRoot:.1%}<extra></extra>'
+                        )).update_layout(
                             height=400,
                             margin=dict(l=20, r=20, t=40, b=20)
                         )
