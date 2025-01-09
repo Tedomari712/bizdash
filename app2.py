@@ -133,20 +133,30 @@ recipients_data = pd.DataFrame({
     'Market_Share': [6.53, 10.58, 6.88, 22.25, 8.50, 8.52, 15.27, 10.34]
 })
 
-# App Layout
+# Start App Layout
 app.layout = dbc.Container([
     # Header
     dbc.Row([
         dbc.Col([
             html.Div([
-                html.Img(src='/assets/vngrd.PNG',
-                     className='logo', 
-                     style={'height': '150px', 'object-fit': 'contain'})
-            ], style={'display': 'flex', 'justifyContent': 'center', 'alignItems': 'center', 
-                     'padding': '40px', 'marginBottom': '30px', 'width': '100%'}),
-            html.H1("2024 Annual Business Transfer Analysis", 
-                   className="text-primary text-center mb-4",
-                   style={'letterSpacing': '2px'})
+                html.Img(
+                    src='/assets/vngrd.PNG',
+                    className='logo', 
+                    style={'height': '150px', 'object-fit': 'contain'}
+                )
+            ], style={
+                'display': 'flex', 
+                'justifyContent': 'center', 
+                'alignItems': 'center', 
+                'padding': '40px', 
+                'marginBottom': '30px', 
+                'width': '100%'
+            }),
+            html.H1(
+                "2024 Annual Business Transfer Analysis", 
+                className="text-primary text-center mb-4",
+                style={'letterSpacing': '2px'}
+            )
         ])
     ]),
 
@@ -157,12 +167,16 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardBody([
                     html.H5("Total Annual Transactions", className="card-title text-center"),
-                    html.H2(f"{monthly_data['Transactions'].sum():,.0f}", 
-                           className="text-primary text-center"),
+                    html.H2(
+                        f"{monthly_data['Transactions'].sum():,.0f}", 
+                        className="text-primary text-center"
+                    ),
                     html.P([
                         html.Span("Monthly Average: ", className="regular-text"),
-                        html.Span(f"{monthly_data['Transactions'].mean():,.0f}",
-                                className="regular-text text-success")
+                        html.Span(
+                            f"{monthly_data['Transactions'].mean():,.0f}",
+                            className="regular-text text-success"
+                        )
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
@@ -179,8 +193,10 @@ app.layout = dbc.Container([
                     ], className="text-primary text-center"),
                     html.P([
                         html.Span("Peak: ", className="regular-text"),
-                        html.Span(f"{monthly_data['Success_Rate'].max():.1f}%",
-                                className="regular-text text-success")
+                        html.Span(
+                            f"{monthly_data['Success_Rate'].max():.1f}%",
+                            className="regular-text text-success"
+                        )
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
@@ -191,12 +207,16 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardBody([
                     html.H5("Total Volume (KES)", className="card-title text-center"),
-                    html.H2(f"{monthly_data['Volume'].sum()/1e9:.2f}B", 
-                           className="text-primary text-center"),
+                    html.H2(
+                        f"{monthly_data['Volume'].sum()/1e9:.2f}B", 
+                        className="text-primary text-center"
+                    ),
                     html.P([
                         html.Span("Monthly Average: ", className="regular-text"),
-                        html.Span(f"KES {monthly_data['Volume'].mean()/1e6:.1f}M",
-                                className="regular-text text-success")
+                        html.Span(
+                            f"KES {monthly_data['Volume'].mean()/1e6:.1f}M",
+                            className="regular-text text-success"
+                        )
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
@@ -207,12 +227,16 @@ app.layout = dbc.Container([
             dbc.Card([
                 dbc.CardBody([
                     html.H5("Total Unique Remitters", className="card-title text-center"),
-                    html.H2(f"{monthly_data['Unique_Remitters'].sum():,.0f}", 
-                           className="text-primary text-center"),
+                    html.H2(
+                        f"{monthly_data['Unique_Remitters'].sum():,.0f}", 
+                        className="text-primary text-center"
+                    ),
                     html.P([
                         html.Span("Monthly Average: ", className="regular-text"),
-                        html.Span(f"{monthly_data['Unique_Remitters'].mean():,.0f}",
-                                className="regular-text text-success")
+                        html.Span(
+                            f"{monthly_data['Unique_Remitters'].mean():,.0f}",
+                            className="regular-text text-success"
+                        )
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
@@ -288,7 +312,7 @@ app.layout = dbc.Container([
         ], width=12)
     ], className="mb-4"),
 
-    # Performance Metrics and User Activity
+    # Success Rate Gauge and User Activity
     dbc.Row([
         # Success Rate Gauge
         dbc.Col([
@@ -307,7 +331,7 @@ app.layout = dbc.Container([
                                        "font": {"size": 28}},
                                 gauge={
                                     'axis': {'range': [0, 100]},
-                                    'bar': {'color': "#90EE90"},  # Light green
+                                    'bar': {'color': "#90EE90"},
                                     'steps': [
                                         {'range': [0, 75], 'color': 'rgba(144, 238, 144, 0.2)'},
                                         {'range': [75, 85], 'color': 'rgba(144, 238, 144, 0.4)'},
@@ -336,7 +360,6 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     dcc.Graph(
                         figure=go.Figure(data=[
-                            # Icons
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1.15, 1.15, 1.15],
@@ -346,7 +369,6 @@ app.layout = dbc.Container([
                                 hoverinfo='none',
                                 showlegend=False
                             ),
-                            # Titles
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[1, 1, 1],
@@ -356,7 +378,6 @@ app.layout = dbc.Container([
                                 hoverinfo='none',
                                 showlegend=False
                             ),
-                            # Values
                             go.Scatter(
                                 x=[0.2, 0.5, 0.8],
                                 y=[0.85, 0.85, 0.85],
@@ -609,8 +630,7 @@ app.layout = dbc.Container([
                                 y=1.02,
                                 xanchor="center",
                                 x=0.5
-                            ),
-                            barmode='group'
+                            )
                         )
                     ),
                     html.Div([
@@ -727,7 +747,7 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Bank Recipients Analysis
+    # Bank Recipients Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -780,9 +800,9 @@ app.layout = dbc.Container([
                                         }
                                     ),
                                     html.Div([
-                                        f"KES {recipients_data.loc[recipients_data['Bank'] == name, 'Volume'].iloc[0]/1e6:.1f}M",
+                                        f"KES {row['Volume']/1e6:.1f}M",
                                         html.Br(),
-                                        f"({recipients_data.loc[recipients_data['Bank'] == name, 'Market_Share'].iloc[0]:.1f}%)"
+                                        f"({row['Market_Share']:.1f}%)"
                                     ], className="text-muted small text-center")
                                 ], style={
                                     'marginBottom': '10px',
@@ -802,7 +822,9 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=12)
-    ], className="mb-4"),
+    ], className="mb-4")
+
+], fluid=True, className="p-4")
 
 # Run the app
 if __name__ == '__main__':
