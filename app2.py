@@ -450,22 +450,27 @@ app.layout = dbc.Container([
     ], className="mb-4"),
 
 # Industry and Geographic Distribution
+# For the Industry Analysis section:
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Transaction Volume by Industry"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=px.treemap(
-                            industry_data,
-                            path=['Industry'],
-                            values='Volume',
-                            color='Volume',
-                            color_continuous_scale='Viridis',
-                            title='Industry Distribution'
-                        ).update_layout(
+                        figure=go.Figure(data=[
+                            go.Bar(
+                                x=industry_data['Industry'],
+                                y=industry_data['Volume']/1e6,
+                                marker_color='rgba(26, 118, 255, 0.8)'
+                            )
+                        ]).update_layout(
+                            title='Industry Distribution',
+                            xaxis_title='Industry',
+                            yaxis_title='Volume (KES Millions)',
+                            xaxis_tickangle=-45,
                             height=450,
-                            margin=dict(l=20, r=20, t=40, b=20)
+                            margin=dict(l=50, r=50, t=50, b=100),
+                            yaxis_type='log'
                         )
                     ),
                     html.Div([
@@ -522,21 +527,24 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Client Market Share and Bank Recipients
+# For the Client Market Share section:
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Client Market Share"),
                 dbc.CardBody([
                     dcc.Graph(
-                        figure=px.treemap(
-                            client_data,
-                            path=['Client'],
-                            values='Volume',
-                            color='Market_Share',
-                            color_continuous_scale='Viridis',
-                            title='Transaction Volume by Client'
-                        ).update_layout(
+                        figure=go.Figure(data=[
+                            go.Pie(
+                                labels=client_data['Client'],
+                                values=client_data['Volume'],
+                                hovertemplate="<b>%{label}</b><br>" +
+                                            "Volume: KES %{value:,.0f}<br>" +
+                                            "Market Share: %{percent}<br>" +
+                                            "<extra></extra>"
+                            )
+                        ]).update_layout(
+                            title='Transaction Volume by Client',
                             height=400,
                             margin=dict(l=20, r=20, t=40, b=20)
                         )
