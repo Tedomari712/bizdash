@@ -219,7 +219,76 @@ app.layout = dbc.Container([
         ])
     ], className="mb-4"),
 
-# Monthly Trends and User Activity
+# Monthly Volume Trends
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Monthly Transaction Analysis"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(data=[
+                            go.Bar(
+                                name='Volume',
+                                x=monthly_data['Month'],
+                                y=monthly_data['Volume']/1e6,
+                                marker_color='rgba(26, 118, 255, 0.8)',
+                                yaxis='y'
+                            ),
+                            go.Scatter(
+                                name='Success Rate',
+                                x=monthly_data['Month'],
+                                y=monthly_data['Success_Rate'],
+                                mode='lines+markers',
+                                marker=dict(
+                                    size=8,
+                                    color='rgba(255, 128, 0, 0.8)'
+                                ),
+                                line=dict(
+                                    width=2,
+                                    color='rgba(255, 128, 0, 0.8)'
+                                ),
+                                yaxis='y2'
+                            )
+                        ]).update_layout(
+                            title='Monthly Volume and Success Rate Trends',
+                            yaxis=dict(
+                                title='Volume (KES Millions)',
+                                titlefont=dict(color='rgba(26, 118, 255, 0.8)'),
+                                tickfont=dict(color='rgba(26, 118, 255, 0.8)')
+                            ),
+                            yaxis2=dict(
+                                title='Success Rate (%)',
+                                titlefont=dict(color='rgba(255, 128, 0, 0.8)'),
+                                tickfont=dict(color='rgba(255, 128, 0, 0.8)'),
+                                overlaying='y',
+                                side='right',
+                                range=[0, 100]
+                            ),
+                            height=400,
+                            margin=dict(l=50, r=50, t=50, b=30),
+                            legend=dict(
+                                orientation="h",
+                                y=1.1,
+                                x=0.5,
+                                xanchor='center'
+                            )
+                        )
+                    ),
+                    html.Div([
+                        html.P([
+                            "Peak Month: December ",
+                            html.Span(
+                                f"(KES {monthly_data['Volume'].max()/1e6:.1f}M, {monthly_data['Success_Rate'].max():.1f}% success rate)",
+                                className="text-muted"
+                            )
+                        ], className="mb-0 mt-3 regular-text text-center")
+                    ])
+                ])
+            ], className="shadow-sm")
+        ], width=12)
+    ], className="mb-4"),
+
+    # Performance Metrics and User Activity
     dbc.Row([
         # Success Rate Gauge
         dbc.Col([
@@ -442,113 +511,6 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Client Market Share and Failure Analysis
-    dbc.Row([
-        # Client Market Share
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader("Client Market Share"),
-                dbc.CardBody([
-                    dcc.Graph(
-                        figure=go.Figure(
-                            data=[go.Pie(
-                                labels=client_data['Client'],
-                                values=client_data['Volume'],
-                                textinfo='label+percent',
-                                hovertemplate=(
-                                    "<b>%{label}</b><br>" +
-                                    "Volume: KES %{value:,.2f}<br>" +
-                                    "Share: %{percent}<extra></extra>"
-                                ),
-                                hole=0.3
-                            )]
-                        ).update_layout(
-                            height=400,
-                            margin=dict(l=20, r=20, t=40, b=20),
-                            legend=dict(
-                                orientation="h",
-                                yanchor="bottom",
-                                y=-0.3,
-                                xanchor="center",
-                                x=0.5
-                            ),
-                            annotations=[{
-                                'text': f'Total Volume<br>KES {client_data["Volume"].sum()/1e9:.2f}B',
-                                'showarrow': False,
-                                'font': {'size': 14}
-                            }]
-                        )
-                    ),
-                    html.Div([
-                        html.Div([
-                            html.Img(
-                                src=f'/assets/{client.lower()}.png',
-                                style={
-                                    'width': '60px',
-                                    'height': '60px',
-                                    'objectFit': 'contain',
-                                    'margin': '5px',
-                                    'borderRadius': '10px',
-                                    'padding': '5px',
-                                    'backgroundColor': '#f8f9fa'
-                                }
-                            ) for client in client_data['Client']
-                        ], style={
-                            'display': 'flex',
-                            'flexWrap': 'wrap',
-                            'justifyContent': 'center',
-                            'alignItems': 'center',
-                            'marginTop': '20px'
-                        })
-                    ])
-                ])
-            ], className="shadow-sm")
-        ], width=6),
-        
-        # Failure Analysis
-        dbc.Col([
-            dbc.Card([
-                dbc.CardHeader("Annual Failure Analysis"),
-                dbc.CardBody([
-                    dcc.Graph(
-                        figure=go.Figure(
-                            go.Treemap(
-                                labels=failure_data['Reason'],
-                                parents=[''] * len(failure_data),
-                                values=failure_data['Count'],
-                                textinfo='label+value+percent parent',
-                                hovertemplate=(
-                                    "<b>%{label}</b><br>" +
-                                    "Count: %{value}<br>" +
-                                    "Percentage: %{percentParent:.1%}<extra></extra>"
-                                ),
-                                marker=dict(
-                                    colors=failure_data['Count'],
-                                    colorscale=[[0, '#ffebee'], [1, '#c62828']],  # Red scale
-                                    showscale=True
-                                ),
-                                textfont=dict(size=13)
-                            )
-                        ).update_layout(
-                            height=400,
-                            margin=dict(l=20, r=20, t=40, b=20),
-                            coloraxis_showscale=True
-                        )
-                    ),
-                    html.Div([
-                        html.P([
-                            "Total Failed Transactions: ",
-                            html.Span(
-                                f"{failure_data['Count'].sum():,}",
-                                className="font-weight-bold"
-                            )
-                        ], className="mb-0 mt-3 regular-text text-center")
-                    ])
-                ])
-            ], className="shadow-sm")
-        ], width=6)
-    ], className="mb-4"),
-
 # Industry and Geographic Distribution
     dbc.Row([
         # Industry Analysis
@@ -663,6 +625,183 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=6)
+    ], className="mb-4"),
+
+# Client Market Share and Failure Analysis
+    dbc.Row([
+        # Client Market Share
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Client Market Share"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(
+                            data=[go.Pie(
+                                labels=client_data['Client'],
+                                values=client_data['Volume'],
+                                textinfo='label+percent',
+                                hovertemplate=(
+                                    "<b>%{label}</b><br>" +
+                                    "Volume: KES %{value:,.2f}<br>" +
+                                    "Share: %{percent}<extra></extra>"
+                                ),
+                                hole=0.3
+                            )]
+                        ).update_layout(
+                            height=400,
+                            margin=dict(l=20, r=20, t=40, b=20),
+                            legend=dict(orientation="h", yanchor="bottom", y=-0.5),
+                            annotations=[{
+                                'text': f'Total Volume<br>KES {client_data["Volume"].sum()/1e9:.2f}B',
+                                'showarrow': False,
+                                'font': {'size': 14}
+                            }]
+                        )
+                    ),
+                    html.Div([
+                        html.Div([
+                            html.Img(
+                                src=f'/assets/{client.lower()}.png',
+                                style={
+                                    'width': '60px',
+                                    'height': '60px',
+                                    'objectFit': 'contain',
+                                    'margin': '5px',
+                                    'borderRadius': '10px',
+                                    'padding': '5px',
+                                    'backgroundColor': '#f8f9fa'
+                                }
+                            ) for client in client_data['Client']
+                        ], style={
+                            'display': 'flex',
+                            'flexWrap': 'wrap',
+                            'justifyContent': 'center',
+                            'alignItems': 'center',
+                            'marginTop': '20px'
+                        })
+                    ])
+                ])
+            ], className="shadow-sm")
+        ], width=6),
+        
+        # Failure Analysis
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Annual Failure Analysis"),
+                dbc.CardBody([
+                    dcc.Graph(
+                        figure=go.Figure(
+                            go.Treemap(
+                                labels=failure_data['Reason'],
+                                parents=[''] * len(failure_data),
+                                values=failure_data['Count'],
+                                textinfo='label+value+percent parent',
+                                hovertemplate=(
+                                    "<b>%{label}</b><br>" +
+                                    "Count: %{value}<br>" +
+                                    "Percentage: %{percentParent:.1%}<extra></extra>"
+                                ),
+                                marker=dict(
+                                    colors=failure_data['Count'],
+                                    colorscale=[[0, '#ffebee'], [1, '#c62828']],  # Red scale
+                                    showscale=True
+                                ),
+                                textfont=dict(size=13)
+                            )
+                        ).update_layout(
+                            height=400,
+                            margin=dict(l=20, r=20, t=40, b=20)
+                        )
+                    ),
+                    html.Div([
+                        html.P([
+                            "Total Failed Transactions: ",
+                            html.Span(
+                                f"{failure_data['Count'].sum():,}",
+                                className="font-weight-bold"
+                            )
+                        ], className="mb-0 mt-3 regular-text text-center")
+                    ])
+                ])
+            ], className="shadow-sm")
+        ], width=6)
+    ], className="mb-4"),
+
+    # Bank Recipients Analysis
+    dbc.Row([
+        dbc.Col([
+            dbc.Card([
+                dbc.CardHeader("Bank Recipients Analysis"),
+                dbc.CardBody([
+                    dbc.Row([
+                        # Treemap visualization
+                        dbc.Col([
+                            dcc.Graph(
+                                figure=go.Figure(
+                                    go.Treemap(
+                                        labels=recipients_data['Bank'],
+                                        parents=[''] * len(recipients_data),
+                                        values=recipients_data['Volume'],
+                                        textinfo='label+value+percent parent',
+                                        hovertemplate=(
+                                            "<b>%{label}</b><br>" +
+                                            "Volume: KES %{value:,.2f}<br>" +
+                                            "Market Share: %{percentParent:.1%}<br>" +
+                                            "<extra></extra>"
+                                        ),
+                                        marker=dict(
+                                            colors=recipients_data['Volume'],
+                                            colorscale='Blues',
+                                            showscale=True
+                                        ),
+                                        textfont=dict(size=13)
+                                    )
+                                ).update_layout(
+                                    height=400,
+                                    margin=dict(l=20, r=20, t=20, b=20)
+                                )
+                            )
+                        ], width=9),
+                        
+                        # Bank logos column
+                        dbc.Col([
+                            html.Div([
+                                html.Div([
+                                    html.Img(
+                                        src=f'/assets/banks/{bank.lower().replace(" ", "_")}.png',
+                                        style={
+                                            'width': '100px',
+                                            'height': '40px',
+                                            'objectFit': 'contain',
+                                            'margin': '5px',
+                                            'backgroundColor': '#f8f9fa',
+                                            'borderRadius': '5px',
+                                            'padding': '5px'
+                                        }
+                                    ),
+                                    html.Div(
+                                        f"KES {row['Volume']/1e6:.1f}M ({row['Market_Share']:.1f}%)",
+                                        className="text-muted small",
+                                        style={'textAlign': 'center'}
+                                    )
+                                ], style={
+                                    'marginBottom': '10px',
+                                    'display': 'flex',
+                                    'flexDirection': 'column',
+                                    'alignItems': 'center'
+                                }) for bank, row in recipients_data.iterrows()
+                            ], style={
+                                'display': 'flex',
+                                'flexDirection': 'column',
+                                'justifyContent': 'space-around',
+                                'height': '100%',
+                                'padding': '10px'
+                            })
+                        ], width=3)
+                    ])
+                ])
+            ], className="shadow-sm")
+        ], width=12)
     ], className="mb-4"),
 
 ], fluid=True, className="p-4")
