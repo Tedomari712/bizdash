@@ -727,7 +727,7 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-    # Bank Recipients Analysis
+# Bank Recipients Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -768,7 +768,7 @@ app.layout = dbc.Container([
                             html.Div([
                                 html.Div([
                                     html.Img(
-                                        src=f'/assets/banks/{bank.lower().replace(" ", "_")}.png',
+                                        src=f'/assets/banks/{name.lower().replace(" ", "_")}.png',
                                         style={
                                             'width': '100px',
                                             'height': '40px',
@@ -779,17 +779,17 @@ app.layout = dbc.Container([
                                             'padding': '5px'
                                         }
                                     ),
-                                    html.Div(
-                                        f"KES {row['Volume']/1e6:.1f}M ({row['Market_Share']:.1f}%)",
-                                        className="text-muted small",
-                                        style={'textAlign': 'center'}
-                                    )
+                                    html.Div([
+                                        f"KES {recipients_data.loc[recipients_data['Bank'] == name, 'Volume'].iloc[0]/1e6:.1f}M",
+                                        html.Br(),
+                                        f"({recipients_data.loc[recipients_data['Bank'] == name, 'Market_Share'].iloc[0]:.1f}%)"
+                                    ], className="text-muted small text-center")
                                 ], style={
                                     'marginBottom': '10px',
                                     'display': 'flex',
                                     'flexDirection': 'column',
                                     'alignItems': 'center'
-                                }) for bank, row in recipients_data.iterrows()
+                                }) for name in recipients_data['Bank']
                             ], style={
                                 'display': 'flex',
                                 'flexDirection': 'column',
@@ -803,8 +803,6 @@ app.layout = dbc.Container([
             ], className="shadow-sm")
         ], width=12)
     ], className="mb-4"),
-
-], fluid=True, className="p-4")
 
 # Run the app
 if __name__ == '__main__':
