@@ -383,7 +383,7 @@ app.layout = dbc.Container([
                                 y=[0.85, 0.85, 0.85],
                                 mode='text',
                                 text=[
-                                    len(country_data),
+                                    "16",
                                     f"{monthly_data['Unique_Remitters'].sum():,}",
                                     f"{monthly_data['Unique_Recipients'].sum():,}"
                                 ],
