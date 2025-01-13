@@ -9,19 +9,6 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import os
 
-# Add the logo mappings here, before app initialization
-# File name mappings for clients
-CLIENT_LOGOS = {
-    'Lemfi': 'CLIENT_LOGOS/LEMFI.png',
-    'DLocal': 'CLIENT_LOGOS/DLocal.png',
-    'Tangent': 'CLIENT_LOGOS/Tangent.jpg',
-    'Nala': 'CLIENT_LOGOS/Nala.png',
-    'Wapipay': 'CLIENT_LOGOS/wapipay.jpg',
-    'Cellulant': 'CLIENT_LOGOS/Cellulant.png',
-    'Hello FXBud': 'CLIENT_LOGOS/fxbud.jpg',
-    'Finpesa': 'CLIENT_LOGOS/finpesa.png'
-}
-
 # Initialize the app
 app = dash.Dash(
     __name__, 
@@ -33,6 +20,29 @@ app = dash.Dash(
 
 # This is important for Render deployment
 server = app.server
+
+# Add the logo mappings here, after app initialization but before data structures
+CLIENT_LOGOS = {
+    'Lemfi': 'LEMFI.png',
+    'DLocal': 'DLocal.png',
+    'Tangent': 'Tangent.jpg',
+    'Nala': 'Nala.png',
+    'Brij': 'brij.png',
+    'Cellulant': 'Cellulant.png',
+    'Wapipay':'wapipay.jpg',
+    'Others': 'Others.jpg'
+}
+
+BANK_LOGOS = {
+    'ABSA Bank': 'Absa.png',
+    'Cooperative Bank': 'Coop.jpg',
+    'DT Bank': 'DTB.png',
+    'Equity Bank': 'Equity.png',
+    'Family Bank': 'Familybank.jpeg',
+    'I&M Bank': 'im.png',
+    'KCB Bank': 'KCB.png',
+    'NCBA Bank': 'NCBA.png'
+}
 
 # Custom CSS
 app.index_string = '''<!DOCTYPE html>
@@ -71,29 +81,33 @@ app.index_string = '''<!DOCTYPE html>
 monthly_data = pd.DataFrame({
     'Month': ['January', 'February', 'March', 'April', 'May', 'June', 
              'July', 'August', 'September', 'October', 'November', 'December'],
-    'Transactions': [133641, 171044, 200841, 204680, 197654, 189258, 
-                    182504, 183429, 84383, 169780, 138824, 68452],
-    'Volume': [2013687811.26, 2490772705.46, 2776712059.66, 2771003331.42, 2732297727.71, 
-               2539282672.75, 2551967296.20, 2890018921.76, 1411203322.06, 2230387153.64, 
-               1849984455.07, 987131225.49],
-    'Success_Rate': [95.47, 97.72, 96.65, 97.87, 99.05, 98.17, 
-                    95.36, 95.11, 94.85, 98.13, 94.52, 94.03],
-    'Unique_Remitters': [20610, 20219, 17487, 26118, 16178, 23345, 
-                        28163, 28799, 23795, 34715, 25236, 18104],
-    'Unique_Recipients': [34553, 50852, 75630, 85424, 66600, 73019, 
-                         67567, 71636, 42967, 80602, 63104, 38295]
+    'Count': [4416, 3709, 4305, 4683, 3325, 2396, 31, 41, 1198, 2147, 3623, 8217],
+    'Volume': [296564946.80, 276359353.66, 278039056.61, 280441910.59, 223579836.58, 
+               143369486.87, 925.00, 3843.65, 22142455.28, 53713252.25, 74217693.61, 523575404.54],
+    'Success_Rate': [96.5, 96.1, 85.2, 91.7, 96.2, 92.0, 38.7, 97.6, 86.6, 97.0, 77.1, 86.8],
+    'Unique_Remitters': [2067, 1762, 1688, 2120, 1309, 1169, 3, 4, 529, 987, 1270, 3367],
+    'Unique_Recipients': [2241, 2080, 2136, 2381, 1865, 1539, 6, 14, 420, 740, 945, 3858]
 })
 
-# Failure data
-failure_data = pd.DataFrame({
-    'Reason': ['General Failure', 'Limit Exceeded', 'Invalid Credit Party', 
-               'Insufficient Balance', 'SOAP Error', 'Timed Out', 'System Error',
-               'Connectivity Error', 'Invalid Account', 'Invalid Details', 'Other'],
-    'Total': [833, 11376, 5416, 31173, 1248, 1640, 485, 194, 557, 4695, 2312],
-    'Percentage': [1.39, 18.98, 9.04, 52.02, 2.08, 2.74, 0.81, 0.32, 0.93, 7.83, 3.86]
+# Industry data
+industry_data = pd.DataFrame({
+    'Industry': ['Other', 'Banking', 'Real Estate', 'Savings', 'Securities & Insurance',
+                'Retail & Grocery', 'Religious', 'Education', 'Hospitality', 'Medical',
+                'Energy & Heavy Industry', 'Government', 'Telco & Tech'],
+    'Volume': [1461861363.64, 134495270.02, 30405803.67, 44181713.27, 19007552.35,
+               10461967.57, 4470010.73, 4785022.56, 3771930.72, 1829661.46,
+               1812760.27, 515721.32, 389141.00]
 })
 
-# Updated hourly data with half-hour intervals
+# Daily transaction data
+daily_data = pd.DataFrame({
+    'Day': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    'Volume': [276574448.00, 279786235.00, 240526477.00, 328697945.00, 
+               397293759.00, 208898138.00, 169167368.00],
+    'Count': [5137, 4597, 4153, 5062, 6718, 4670, 3715]
+})
+
+# Updated hourly data
 hourly_data = pd.DataFrame({
     'Hour': ['12:00:00 AM', '12:30:00 AM', '1:00:00 AM', '1:30:00 AM', '2:00:00 AM', '2:30:00 AM', 
             '3:00:00 AM', '3:30:00 AM', '4:00:00 AM', '4:30:00 AM', '5:00:00 AM', '5:30:00 AM', 
@@ -103,45 +117,57 @@ hourly_data = pd.DataFrame({
             '3:00:00 PM', '3:30:00 PM', '4:00:00 PM', '4:30:00 PM', '5:00:00 PM', '5:30:00 PM',
             '6:00:00 PM', '6:30:00 PM', '7:00:00 PM', '7:30:00 PM', '8:00:00 PM', '8:30:00 PM',
             '9:00:00 PM', '9:30:00 PM', '10:00:00 PM', '10:30:00 PM', '11:00:00 PM', '11:30:00 PM'],
-    'Volume': [239901818.81, 244991276.09, 225345783.38, 239690642.99, 261409055.99, 286688826.43,
-              336935592.92, 365831601.29, 426891279.31, 475891128.44, 518967965.34, 558806726.45,
-              593022936.74, 611179510.15, 685317245.20, 667263464.74, 692677269.65, 697109566.67,
-              739877303.90, 735930672.71, 744234540.79, 759891766.66, 784129511.47, 760450859.64,
-              796315758.28, 783213808.44, 834070722.89, 841420254.91, 802473919.21, 800976384.25,
-              785374503.63, 766217167.73, 762218552.20, 721923234.09, 658575263.68, 643863311.42,
-              611843138.71, 611227839.98, 585600775.32, 533709014.43, 509964810.15, 461427440.03,
-              444715572.40, 400121854.04, 355988522.99, 336914663.10, 293197740.74, 250658084.10],
-    'Count': [13227, 12799, 12627, 13473, 15001, 16630, 19864, 22101, 26156, 29393, 32579, 35504,
-              38688, 40719, 44114, 43998, 46626, 47937, 50107, 50920, 53048, 51906, 54098, 54047,
-              56413, 66726, 69391, 60756, 60297, 60479, 59526, 58740, 56640, 53619, 50586, 48568,
-              45561, 44122, 40435, 37372, 33066, 29971, 27130, 24256, 21395, 19049, 16791, 14891]
+    'Volume': [23923595.64, 28073570.30, 20093102.50, 18651483.10, 20284409.18, 18327660.92,
+              21046999.52, 18624234.82, 17169134.74, 15938434.62, 16470431.39, 18256504.64,
+              14473250.50, 16664174.87, 21174240.02, 24384442.52, 28430233.46, 35683605.96,
+              32293483.80, 33624440.10, 35471112.12, 41021127.01, 42365401.43, 47930870.44,
+              38029682.04, 41993842.60, 43313929.16, 35436329.29, 34235004.81, 47425583.34,
+              39225509.52, 40058302.81, 34244174.47, 35949800.94, 31541304.54, 34645475.68,
+              42870360.52, 41022579.30, 40635039.28, 33436334.89, 42422933.78, 45150244.19,
+              35818593.44, 29583004.24, 33139351.87, 31088863.08, 29389421.09, 32641760.13],
+    'Count': [456, 443, 433, 365, 354, 325, 421, 277, 309, 327, 309, 285,
+              246, 287, 298, 356, 392, 495, 478, 480, 524, 598, 669, 897,
+              593, 651, 658, 630, 627, 695, 648, 654, 591, 602, 639, 602,
+              597, 642, 677, 588, 704, 711, 588, 494, 513, 463, 444, 503]
 })
 
-# Country data - excluding Unknown
+# Failure data
+failure_data = pd.DataFrame({
+    'Reason': ['Insufficient Balance', 'Other', 'System Error', 'Invalid Account', 
+               'Invalid Credit Party', 'Timed Out', 'General Failure', 'SOAP Error', 'Limit Exceeded'],
+    'Count': [2216, 592, 437, 251, 83, 133, 23, 6, 2],
+    'Percentage': [58.3, 15.6, 11.5, 6.6, 2.2, 3.5, 0.6, 0.2, 0.1]
+})
+
+# Country data
 country_data = pd.DataFrame({
-    'Country': ['CAN', 'FIN', 'GBR', 'GER', 'IRL', 'KEN', 'NGA', 'UGA', 'USA', 'Unknown'],
-    'Volume': [1517951948.64, 307421630.62, 11315946583.70, 101630751.00, 153890861.47,
-               846415656.43, 101777855.36, 896761980.11, 6791147045.70, 4772819388.13],
-    'Transactions': [118717, 28193, 864380, 6034, 10630, 68183, 9028, 1609, 402476, 327200],
-    'Market_Share': [5.66, 1.15, 42.21, 0.38, 0.57, 3.16, 0.38, 3.35, 25.33, 17.81]
-})
-
-# Daily data from the PDF
-daily_data = pd.DataFrame({
-    'Day': ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    'Volume': [3446887082.69, 3542203701.92, 3856600588.57, 4174561072.82, 
-               5582156391.24, 3962547257.90, 2679492587.34],
-    'Count': [231857, 236668, 249814, 264715, 348966, 297996, 231426]
+    'Country': ['United Kingdom (GBR)', 'United States (USA)', 'Canada (CAN)', 
+                'Kenya (KEN)', 'Nigeria (NGA)', 'Tanzania (TZA)', 'UAE',
+                'Denmark (DEN)', 'India (IND)'],
+    'Volume_KES': [961197746.35, 422501849.21, 68916278.01, 
+                   32036111.63, 6352832.02, 391069.01, 51955.00,
+                   159767.50, 45998.61],
+    'Transactions': [18050, 7906, 1842, 1339, 395, 6, 2, 4, 2]
 })
 
 # Client data
 client_data = pd.DataFrame({
-    'Client': ['Lemfi', 'Cellulant', 'Nala', 'DLocal', 'Wapipay', 'Hello FXBud', 
-              'Finpesa', 'Tangent', 'Others'],
-    'Volume': [11606556833.85, 6280089643.65, 8055904624.99, 248808932.68, 
-               1510015.74, 617699.08, 973692826.00, 76931592.49, 0.00],
-    'Transactions': [836080, 443517, 560706, 16028, 174, 103, 1571, 3090, 0],
-    'Market_Share': [42.60, 23.05, 29.57, 0.91, 0.01, 0.00, 3.57, 0.28, 0.00]
+    'Client': ['Lemfi', 'DLocal', 'Tangent', 'Nala', 'Wapipay', 'Brij', 
+              'Cellulant', 'Others'],
+    'Volume': [1701947843.25, 410741870.10, 31148619.48, 13119614.16, 
+              15022090.45, 28085.00, 43.00, 0.00],
+    'Transactions': [29281, 4547, 203, 173, 42, 42, 4, 0],
+    'Market_Share': [78.36, 18.91, 1.43, 0.60, 0.69, 0.01, 0.00, 0.00]
+})
+
+# Bank recipients data
+recipients_data = pd.DataFrame({
+    'Bank': ['ABSA Bank', 'Cooperative Bank', 'DT Bank', 'Equity Bank', 
+            'Family Bank', 'I&M Bank', 'KCB Bank', 'NCBA Bank'],
+    'Volume': [7282025.65, 11802956.97, 7677251.81, 24819864.19,
+              9481656.86, 9501100.76, 17038871.74, 11536537.68],
+    'Transactions': [139, 338, 124, 889, 215, 244, 348, 195],
+    'Market_Share': [6.53, 10.58, 6.88, 22.25, 8.50, 8.52, 15.27, 10.34]
 })
 
 # Start App Layout
@@ -151,7 +177,7 @@ app.layout = dbc.Container([
         dbc.Col([
             html.Div([
                 html.Img(
-                    src='assets/vngrd.PNG',
+                    src='/assets/vngrd.PNG',
                     className='logo', 
                     style={'height': '150px', 'object-fit': 'contain'}
                 )
@@ -164,7 +190,7 @@ app.layout = dbc.Container([
                 'width': '100%'
             }),
             html.H1(
-                "2024 Mobile Wallet Transfer Analysis", 
+                "2024 Annual Business Transfer Analysis", 
                 className="text-primary text-center mb-4",
                 style={'letterSpacing': '2px'}
             )
@@ -179,13 +205,13 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     html.H5("Total Annual Transactions", className="card-title text-center"),
                     html.H2(
-                        f"{monthly_data['Transactions'].sum():,.0f}", 
+                        f"{monthly_data['Count'].sum():,.0f}", 
                         className="text-primary text-center"
                     ),
                     html.P([
                         html.Span("Monthly Average: ", className="regular-text"),
                         html.Span(
-                            f"{monthly_data['Transactions'].mean():,.0f}",
+                            f"{monthly_data['Count'].mean():,.0f}",
                             className="regular-text text-success"
                         )
                     ], className="text-center")
@@ -225,15 +251,15 @@ app.layout = dbc.Container([
                     html.P([
                         html.Span("Monthly Average: ", className="regular-text"),
                         html.Span(
-                            f"KES 2.27B",
+                            f"KES {monthly_data['Volume'].mean()/1e6:.1f}M",
                             className="regular-text text-success"
                         )
                     ], className="text-center")
                 ])
             ], className="shadow-sm")
         ]),
-
-        # Unique Users Card
+        
+        # Unique Remitters Card
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
@@ -254,7 +280,7 @@ app.layout = dbc.Container([
         ])
     ], className="mb-4"),
 
-# Monthly Volume Trends
+    # Monthly Volume Trends
     dbc.Row([
         dbc.Col([
             dbc.Card([
@@ -446,7 +472,7 @@ app.layout = dbc.Container([
                             go.Scatter(
                                 name='Transactions',
                                 x=daily_data['Day'],
-                                y=daily_data['Transactions'],
+                                y=daily_data['Count'],
                                 mode='lines+markers',
                                 marker_color='rgba(255, 128, 0, 0.8)',
                                 yaxis='y2'
@@ -479,7 +505,7 @@ app.layout = dbc.Container([
                         html.P([
                             "Peak Day: Friday ",
                             html.Span(
-                                f"(KES {daily_data['Volume'].max()/1e6:.1f}M, {daily_data['Transactions'].max():,} transactions)",
+                                f"(KES {daily_data['Volume'].max()/1e6:.1f}M, {daily_data['Count'].max():,} transactions)",
                                 className="text-muted"
                             )
                         ], className="mb-0 mt-3 regular-text")
@@ -487,7 +513,7 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=6),
-        
+
         # Hourly Transaction Pattern
         dbc.Col([
             dbc.Card([
@@ -619,7 +645,7 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=6),
-        
+
         # Geographic Distribution
         dbc.Col([
             dbc.Card([
@@ -745,7 +771,7 @@ app.layout = dbc.Container([
                 ])
             ], className="shadow-sm")
         ], width=6),
-        
+
         # Failure Analysis
         dbc.Col([
             dbc.Card([
@@ -879,5 +905,3 @@ app.layout = dbc.Container([
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     app.run_server(debug=False, host='0.0.0.0', port=port)
-
-    
