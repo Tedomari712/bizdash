@@ -671,7 +671,7 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Client Market Share and Failure Analysis
+    # Client Market Share and Failure Analysis
     dbc.Row([
         # Client Market Share
         dbc.Col([
@@ -694,36 +694,34 @@ app.layout = dbc.Container([
                         ).update_layout(
                             height=400,
                             margin=dict(l=20, r=20, t=40, b=20),
-                            legend=dict(orientation="h", yanchor="bottom", y=-0.5),
-                            annotations=[{
-                                'text': f'Total Volume<br>KES {client_data["Volume"].sum()/1e9:.2f}B',
-                                'showarrow': False,
-                                'font': {'size': 14}
-                            }]
+                            legend=dict(orientation="h", yanchor="bottom", y=-0.5)
                         )
                     ),
                     html.Div([
-                        html.Div([
+                        *[
                             html.Img(
-                                src=f'/assets/{client.lower()}.png',
+                                src=f'/assets/{CLIENT_LOGOS.get(client, "Others.jpg")}',
+                                id=f'client-logo-{client}',
                                 style={
-                                    'width': '60px',
-                                    'height': '60px',
+                                    'maxWidth': '80px',
+                                    'maxHeight': '40px',
+                                    'width': 'auto',
+                                    'height': 'auto',
                                     'objectFit': 'contain',
                                     'margin': '5px',
-                                    'borderRadius': '10px',
                                     'padding': '5px',
-                                    'backgroundColor': '#f8f9fa'
+                                    'backgroundColor': '#f8f9fa',
+                                    'borderRadius': '5px'
                                 }
                             ) for client in client_data['Client']
-                        ], style={
-                            'display': 'flex',
-                            'flexWrap': 'wrap',
-                            'justifyContent': 'center',
-                            'alignItems': 'center',
-                            'marginTop': '20px'
-                        })
-                    ])
+                        ]
+                    ], style={
+                        'display': 'flex',
+                        'flexWrap': 'wrap',
+                        'justifyContent': 'center',
+                        'alignItems': 'center',
+                        'marginTop': '20px'
+                    })
                 ])
             ], className="shadow-sm")
         ], width=6),
@@ -771,14 +769,14 @@ app.layout = dbc.Container([
         ], width=6)
     ], className="mb-4"),
 
-# Bank Recipients Analysis
+    # Bank Recipients Analysis
     dbc.Row([
         dbc.Col([
             dbc.Card([
                 dbc.CardHeader("Bank Recipients Analysis"),
                 dbc.CardBody([
                     dbc.Row([
-                        # Treemap visualization
+                        # Treemap visualization remains the same (width=9 column)
                         dbc.Col([
                             dcc.Graph(
                                 figure=go.Figure(
@@ -813,10 +811,13 @@ app.layout = dbc.Container([
                                 *[
                                     html.Div([
                                         html.Img(
-                                            src=f'/assets/banks/{bank.lower().replace(" ", "_")}.png',
+                                            src=f'/assets/{BANK_LOGOS.get(bank, "bank_default.png")}',
+                                            id=f'bank-logo-{bank}',
                                             style={
-                                                'width': '100px',
-                                                'height': '40px',
+                                                'maxWidth': '120px',
+                                                'maxHeight': '50px',
+                                                'width': 'auto',
+                                                'height': 'auto',
                                                 'objectFit': 'contain',
                                                 'margin': '5px',
                                                 'backgroundColor': '#f8f9fa',
@@ -830,7 +831,7 @@ app.layout = dbc.Container([
                                             f"({recipients_data.loc[recipients_data['Bank'] == bank, 'Market_Share'].iloc[0]:.1f}%)"
                                         ], className="text-muted small text-center")
                                     ], style={
-                                        'marginBottom': '10px',
+                                        'marginBottom': '15px',
                                         'display': 'flex',
                                         'flexDirection': 'column',
                                         'alignItems': 'center'
@@ -841,14 +842,16 @@ app.layout = dbc.Container([
                                 'flexDirection': 'column',
                                 'justifyContent': 'space-around',
                                 'height': '100%',
-                                'padding': '10px'
+                                'padding': '10px',
+                                'overflowY': 'auto',
+                                'maxHeight': '400px'
                             })
                         ], width=3)
                     ])
                 ])
             ], className="shadow-sm")
         ], width=12)
-    ], className="mb-4")
+    ], className="mb-4"),
 
 ], fluid=True, className="p-4")
 
