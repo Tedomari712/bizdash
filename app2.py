@@ -37,7 +37,7 @@ CLIENT_LOGOS = {
 BANK_LOGOS = {
     'ABSA Bank': 'Absa.png',
     'Cooperative Bank': 'Coop.jpg',
-    'DT Bank': 'dtb_red.png',
+    'DT Bank': 'DTB.png',
     'Equity Bank': 'Equity.png',
     'Family Bank': 'Familybank.jpeg',
     'I&M Bank': 'im.png',
