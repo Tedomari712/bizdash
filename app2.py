@@ -21,6 +21,30 @@ app = dash.Dash(
 # This is important for Render deployment
 server = app.server
 
+# Add the logo mappings here, after app initialization but before data structures
+# File name mappings for clients and banks
+CLIENT_LOGOS = {
+    'Lemfi': 'LEMFI.png',
+    'DLocal': 'DLocal.png',
+    'Tangent': 'Tangent.jpg',
+    'Nala': 'Nala.png',
+    'Brij': 'brij.png',
+    'Cellulant': 'Cellulant.png',
+    'Wapipay':'wapipay.jpg',
+    'Others': 'Others.jpg'
+}
+
+BANK_LOGOS = {
+    'ABSA Bank': 'Absa.png',
+    'Cooperative Bank': 'Coop.jpg',
+    'DT Bank': 'dtb_red.png',
+    'Equity Bank': 'Equity.png',
+    'Family Bank': 'Familybank.jpeg',
+    'I&M Bank': 'im.png',
+    'KCB Bank': 'KCB.png',
+    'NCBA Bank': 'NCBA.png'
+}
+
 # Custom CSS
 app.index_string = '''<!DOCTYPE html>
 <html>
