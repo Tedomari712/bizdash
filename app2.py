@@ -577,8 +577,8 @@ app.layout = dbc.Container([
                             xaxis=dict(
                                 tickangle=-45,
                                 tickmode='array',
-                                ticktext=hourly_data['Hour'],
-                                tickvals=list(range(len(hourly_data)))
+                                ticktext=[hour for i, hour in enumerate(hourly_data['Hour']) if i % 2 == 0],
+                                tickvals=[i for i in range(len(hourly_data)) if i % 2 == 0]
                             )
                         )
                     ),
