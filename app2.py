@@ -83,10 +83,10 @@ monthly_data = pd.DataFrame({
              'July', 'August', 'September', 'October', 'November', 'December'],
     'Count': [4416, 3709, 4305, 4683, 3325, 2396, 31, 41, 1198, 2147, 3623, 8217],
     'Volume': [296564946.80, 276359353.66, 278039056.61, 280441910.59, 223579836.58, 
-               143369486.87, 925.00, 3843.65, 22142455.28, 53713252.25, 74217693.61, 523575404.54],
-    'Success_Rate': [96.5, 96.1, 85.2, 91.7, 96.2, 92.0, 38.7, 97.6, 86.6, 97.0, 77.1, 86.8],
-    'Unique_Remitters': [2067, 1762, 1688, 2120, 1309, 1169, 3, 4, 529, 987, 1270, 3367],
-    'Unique_Recipients': [2241, 2080, 2136, 2381, 1865, 1539, 6, 14, 420, 740, 945, 3858]
+               143369486.87, 925.00, 3843.65, 22142455.28, 53713252.25, 74217693.61, 69555157.68],
+    'Success_Rate': [96.5, 96.1, 85.2, 91.7, 96.2, 92.0, 38.7, 97.6, 86.6, 97.0, 77.1, 80.1],
+    'Unique_Remitters': [2067, 1762, 1688, 2120, 1309, 1169, 3, 4, 529, 987, 1270, 1457],
+    'Unique_Recipients': [2241, 2080, 2136, 2381, 1865, 1539, 6, 14, 420, 740, 945, 1229]
 })
 
 # Industry data
@@ -265,13 +265,13 @@ app.layout = dbc.Container([
                 dbc.CardBody([
                     html.H5("Total Unique Remitters", className="card-title text-center"),
                     html.H2(
-                        f"34,500", 
+                        f"29,961", 
                         className="text-primary text-center"
                     ),
                     html.P([
                         html.Span("Monthly Growth Rate: ", className="regular-text"),
                         html.Span(
-                            f"18.93%",
+                            f"17.54%",
                             className="regular-text text-success"
                         )
                     ], className="text-center")
