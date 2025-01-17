@@ -263,7 +263,7 @@ app.layout = dbc.Container([
         dbc.Col([
             dbc.Card([
                 dbc.CardBody([
-                    html.H5("Total Unique Remitters", className="card-title text-center"),
+                    html.H5("Total Unique Users", className="card-title text-center"),
                     html.H2(
                         f"29,961", 
                         className="text-primary text-center"
