@@ -1,4 +1,4 @@
-# Import required libraries
+# Imports
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import os
 
-# Initialize the app
+# App initialization
 app = dash.Dash(
     __name__, 
     external_stylesheets=[
@@ -18,10 +18,10 @@ app = dash.Dash(
     ]
 )
 
-# This is important for Render deployment
+# Render deployment
 server = app.server
 
-# Add the logo mappings here, after app initialization but before data structures
+# Logo mappings
 CLIENT_LOGOS = {
     'Lemfi': 'LEMFI.png',
     'DLocal': 'DLocal.png',
@@ -107,7 +107,7 @@ daily_data = pd.DataFrame({
     'Count': [5137, 4597, 4153, 5062, 6718, 4670, 3715]
 })
 
-# Updated hourly data
+# Hourly data
 hourly_data = pd.DataFrame({
     'Hour': ['12:00:00 AM', '12:30:00 AM', '1:00:00 AM', '1:30:00 AM', '2:00:00 AM', '2:30:00 AM', 
             '3:00:00 AM', '3:30:00 AM', '4:00:00 AM', '4:30:00 AM', '5:00:00 AM', '5:30:00 AM', 
@@ -791,7 +791,7 @@ app.layout = dbc.Container([
                                 ),
                                 marker=dict(
                                     colors=failure_data['Count'],
-                                    colorscale=[[0, '#ffebee'], [1, '#c62828']],  # Red scale
+                                    colorscale=[[0, '#ffebee'], [1, '#c62828']],  
                                     showscale=True
                                 ),
                                 textfont=dict(size=13)
